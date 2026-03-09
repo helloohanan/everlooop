@@ -35,6 +35,7 @@ model Product {
   type         String
   size         String
   material     String
+  purchasedPrice Float         @default(0)
   price        Float
   stock        Int           @default(0)
   lowStock     Int           @default(5)

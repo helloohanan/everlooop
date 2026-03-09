@@ -22,8 +22,8 @@ export async function PUT(
   try {
     const { id } = await params
     const body = await request.json()
-    const { name, type, size, material, price, stock, lowStock, description, image } = body
-    
+    const { name, type, size, material, purchasedPrice, price, stock, lowStock, description, image } = body
+
     const product = await prisma.product.update({
       where: { id },
       data: {
@@ -31,6 +31,7 @@ export async function PUT(
         type,
         size,
         material,
+        purchasedPrice: parseFloat(purchasedPrice) || 0,
         price: parseFloat(price),
         stock: parseInt(stock),
         lowStock: parseInt(lowStock) || 5,
@@ -38,7 +39,7 @@ export async function PUT(
         image,
       },
     })
-    
+
     return NextResponse.json(product)
   } catch {
     return NextResponse.json({ error: 'Server error' }, { status: 500 })

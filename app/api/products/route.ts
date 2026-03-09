@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search') || ''
     const type = searchParams.get('type') || ''
-    
+
     const products = await prisma.product.findMany({
       where: {
         AND: [
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       },
       orderBy: { createdAt: 'desc' },
     })
-    
+
     return NextResponse.json(products)
   } catch (err) {
     console.error('GET products error:', err)
@@ -33,12 +33,12 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { productId, name, type, size, material, price, stock, lowStock, description, image } = body
-    
+    const { productId, name, type, size, material, purchasedPrice, price, stock, lowStock, description, image } = body
+
     if (!productId || !name || !price) {
       return NextResponse.json({ error: 'Product ID, name and price are required' }, { status: 400 })
     }
-    
+
     const product = await prisma.product.create({
       data: {
         productId,
@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
         type: type || 'Other',
         size: size || '',
         material: material || 'Other',
+        purchasedPrice: parseFloat(purchasedPrice) || 0,
         price: parseFloat(price),
         stock: parseInt(stock) || 0,
         lowStock: parseInt(lowStock) || 5,
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
         image,
       },
     })
-    
+
     return NextResponse.json(product, { status: 201 })
   } catch (err: any) {
     if (err.code === 'P2002') {

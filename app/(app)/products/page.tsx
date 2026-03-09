@@ -9,6 +9,7 @@ interface Product {
   type: string
   size: string
   material: string
+  purchasedPrice: number
   price: number
   stock: number
   lowStock: number
@@ -31,6 +32,7 @@ function ProductModal({ product, onClose, onSave }: {
     type: product?.type || 'Persian',
     size: product?.size || '',
     material: product?.material || 'Wool',
+    purchasedPrice: product?.purchasedPrice?.toString() || '',
     price: product?.price?.toString() || '',
     stock: product?.stock?.toString() || '0',
     lowStock: product?.lowStock?.toString() || '5',
@@ -105,11 +107,17 @@ function ProductModal({ product, onClose, onSave }: {
                 </select>
               </div>
             </div>
-            <div className="form-row-3">
+            <div className="form-row-2">
               <div className="form-group">
-                <label className="form-label">Price (QAR) *</label>
+                <label className="form-label">Purchased Price (QAR) *</label>
+                <input id="prod-purchased-price" className="form-input" type="number" min="0" step="0.01" value={form.purchasedPrice} onChange={e => setForm({ ...form, purchasedPrice: e.target.value })} required placeholder="0.00" />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Selling Price (QAR) *</label>
                 <input id="prod-price" className="form-input" type="number" min="0" step="0.01" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} required placeholder="0.00" />
               </div>
+            </div>
+            <div className="form-row-2">
               <div className="form-group">
                 <label className="form-label">Stock Quantity</label>
                 <input id="prod-stock" className="form-input" type="number" min="0" value={form.stock} onChange={e => setForm({ ...form, stock: e.target.value })} />
@@ -349,11 +357,17 @@ export default function ProductsPage() {
                         </div>
                       )}
 
-                      <div style={{ marginTop: 'auto', paddingTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <span style={{ fontWeight: 700, fontSize: '14px' }}>{formatCurr(p.price)}</span>
-                        <span className={`badge ${getStockLevel(p.stock, p.lowStock)}`} style={{ fontSize: '11px' }}>
-                          {p.stock === 0 ? <><IconX size={12} /> Out of Stock</> : p.stock <= p.lowStock ? <><IconWarning size={12} /> Low ({p.stock})</> : <><IconCheck size={12} /> {p.stock}</>}
-                        </span>
+                      <div style={{ marginTop: 'auto', paddingTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Cost:</span>
+                          <span style={{ fontWeight: 600, fontSize: '13px', color: 'var(--text-muted)' }}>{formatCurr(p.purchasedPrice)}</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ fontWeight: 700, fontSize: '14px' }}>{formatCurr(p.price)}</span>
+                          <span className={`badge ${getStockLevel(p.stock, p.lowStock)}`} style={{ fontSize: '11px' }}>
+                            {p.stock === 0 ? <><IconX size={12} /> Out of Stock</> : p.stock <= p.lowStock ? <><IconWarning size={12} /> Low ({p.stock})</> : <><IconCheck size={12} /> {p.stock}</>}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div> {/* End of flip-card-front */}
