@@ -25,6 +25,8 @@ export default function DashboardPage() {
       .catch(() => setLoading(false))
   }, [])
 
+  const [showLowStockDetails, setShowLowStockDetails] = useState(false)
+
   if (loading) {
     return (
       <div className="page-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
@@ -76,12 +78,16 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="stat-card" style={{ '--stat-color': '#ef4444', '--stat-bg': 'rgba(239,68,68,0.1)' } as React.CSSProperties}>
+        <div
+          className="stat-card"
+          style={{ '--stat-color': '#ef4444', '--stat-bg': 'rgba(239,68,68,0.1)', cursor: 'pointer' } as React.CSSProperties}
+          onClick={() => setShowLowStockDetails(!showLowStockDetails)}
+        >
           <div className="stat-icon"><IconWarning size={28} /></div>
           <div className="stat-info">
             <div className="stat-value">{data?.lowStockProducts?.length || 0}</div>
             <div className="stat-label">Low Stock Alerts</div>
-            <div className="stat-sub">Need restocking</div>
+            <div className="stat-sub">{showLowStockDetails ? 'Click to hide details' : 'Click to view details'}</div>
           </div>
         </div>
       </div>
@@ -115,26 +121,42 @@ export default function DashboardPage() {
         <div className="card">
           <div className="card-header">
             <h2 className="card-title"><IconWarning /> Low Stock</h2>
-            <a href="/products" style={{ fontSize: '12px', color: 'var(--brand-primary)', textDecoration: 'none', fontWeight: 600 }}>View all →</a>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                className="btn btn-sm btn-secondary"
+                onClick={() => setShowLowStockDetails(!showLowStockDetails)}
+                style={{ fontSize: '11px', padding: '2px 8px' }}
+              >
+                {showLowStockDetails ? 'Hide' : 'Show'}
+              </button>
+              <a href="/products" style={{ fontSize: '12px', color: 'var(--brand-primary)', textDecoration: 'none', fontWeight: 600 }}>View all →</a>
+            </div>
           </div>
           <div className="card-body" style={{ padding: '12px' }}>
-            {data?.lowStockProducts && data.lowStockProducts.length > 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {data.lowStockProducts.map(p => (
-                  <div key={p.id} style={{ padding: '10px 12px', background: 'var(--bg-badge-danger)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>{p.name}</div>
-                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{p.productId}</div>
+            {showLowStockDetails ? (
+              data?.lowStockProducts && data.lowStockProducts.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {data.lowStockProducts.map(p => (
+                    <div key={p.id} style={{ padding: '10px 12px', background: 'var(--bg-badge-danger)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>{p.name}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{p.productId}</div>
+                      </div>
+                      <span className="badge badge-danger">{p.stock} left</span>
                     </div>
-                    <span className="badge badge-danger">{p.stock} left</span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="empty-state" style={{ padding: '30px 10px' }}>
+                  <div className="empty-state-icon"><IconCheck size={32} /></div>
+                  <div className="empty-state-title">All stocked up!</div>
+                  <div className="empty-state-desc">No low stock items</div>
+                </div>
+              )
             ) : (
-              <div className="empty-state" style={{ padding: '30px 10px' }}>
-                <div className="empty-state-icon"><IconCheck size={32} /></div>
-                <div className="empty-state-title">All stocked up!</div>
-                <div className="empty-state-desc">No low stock items</div>
+              <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)', fontSize: '13px' }}>
+                <IconWarning size={24} style={{ marginBottom: '8px', opacity: 0.5 }} />
+                <div>Details hidden. Click 'Show' or the alert card to view.</div>
               </div>
             )}
           </div>
