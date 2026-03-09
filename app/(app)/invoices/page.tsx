@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import { IconPlus, IconSearch, IconInvoice, IconCurrency, IconDashboard, IconCheck, IconClock, IconView, IconPrint, IconDelete } from '@/components/Icons'
 
 interface Invoice {
   id: string
@@ -53,12 +54,12 @@ export default function InvoicesPage() {
           <h1 className="section-title">Invoices</h1>
           <p className="section-subtitle">{invoices.length} invoices found</p>
         </div>
-        <a href="/billing" className="btn btn-primary" id="new-invoice-btn">➕ New Invoice</a>
+        <a href="/billing" className="btn btn-primary" id="new-invoice-btn"><IconPlus style={{ marginRight: '8px' }} /> New Invoice</a>
       </div>
 
       <div className="toolbar">
         <div className="search-input-wrapper">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"><IconSearch /></span>
           <input
             id="invoice-search"
             className="form-input search-input"
@@ -86,7 +87,7 @@ export default function InvoicesPage() {
             <div style={{ textAlign: 'center', padding: '40px' }}><div className="spinner" style={{ margin: '0 auto' }} /></div>
           ) : invoices.length === 0 ? (
             <div className="empty-state">
-              <div className="empty-state-icon">🧾</div>
+              <div className="empty-state-icon"><IconInvoice size={48} /></div>
               <div className="empty-state-title">No invoices found</div>
               <div className="empty-state-desc"><a href="/billing" style={{ color: 'var(--brand-primary)' }}>Create a new invoice</a></div>
             </div>
@@ -119,25 +120,25 @@ export default function InvoicesPage() {
                     <td style={{ color: 'var(--text-secondary)' }}>{formatDate(inv.date)}</td>
                     <td style={{ color: 'var(--text-secondary)' }}>{inv.items.length} item{inv.items.length !== 1 ? 's' : ''}</td>
                     <td style={{ color: 'var(--text-secondary)' }}>
-                      {inv.paymentMethod === 'Cash' ? '💵' : inv.paymentMethod === 'Card' ? '💳' : '🏦'} {inv.paymentMethod}
+                      {inv.paymentMethod === 'Cash' ? <IconCurrency size={14} style={{ marginRight: '4px' }} /> : inv.paymentMethod === 'Card' ? <IconInvoice size={14} style={{ marginRight: '4px' }} /> : <IconDashboard size={14} style={{ marginRight: '4px' }} />} {inv.paymentMethod}
                     </td>
                     <td style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{formatCurrency(inv.total)}</td>
                     <td>
                       <span className={`badge ${inv.paymentStatus === 'Paid' ? 'badge-paid' : 'badge-pending'}`}>
-                        {inv.paymentStatus === 'Paid' ? '✓' : '⏳'} {inv.paymentStatus}
+                        {inv.paymentStatus === 'Paid' ? <IconCheck size={12} style={{ marginRight: '4px' }} /> : <IconClock size={12} style={{ marginRight: '4px' }} />} {inv.paymentStatus}
                       </span>
                     </td>
                     <td>
                       <div className="table-actions">
-                        <a href={`/invoices/${inv.id}`} className="btn btn-sm btn-secondary" title="View invoice">👁️</a>
-                        <a href={`/invoices/${inv.id}?print=true`} className="btn btn-sm btn-secondary" title="Print">🖨️</a>
+                        <a href={`/invoices/${inv.id}`} className="btn btn-sm btn-secondary" title="View invoice"><IconView /></a>
+                        <a href={`/invoices/${inv.id}?print=true`} className="btn btn-sm btn-secondary" title="Print"><IconPrint /></a>
                         <button
                           onClick={() => handleDelete(inv.id, inv.invoiceNumber)}
                           className="btn btn-sm btn-secondary"
                           title="Delete"
                           style={{ color: 'var(--brand-danger)' }}
                         >
-                          🗑️
+                          <IconDelete />
                         </button>
                       </div>
                     </td>

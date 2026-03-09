@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
+import { IconEdit, IconPlus, IconWarning, IconClock, IconSave, IconSearch, IconCustomers, IconInvoice, IconDelete, IconInvoices } from '@/components/Icons'
 
 interface Customer {
   id: string
@@ -43,35 +44,35 @@ function CustomerModal({ customer, onClose, onSave }: {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 className="modal-title">{customer ? '✏️ Edit Customer' : '➕ Add Customer'}</h2>
+          <h2 className="modal-title">{customer ? <><IconEdit /> Edit Customer</> : <><IconPlus /> Add Customer</>}</h2>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {error && <div className="alert alert-danger">⚠️ {error}</div>}
+            {error && <div className="alert alert-danger"><IconWarning /> {error}</div>}
             <div className="form-group">
               <label className="form-label">Customer Name *</label>
-              <input id="cust-name" className="form-input" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required placeholder="Full name" />
+              <input id="cust-name" className="form-input" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required placeholder="Full name" />
             </div>
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Phone Number</label>
-                <input id="cust-phone" className="form-input" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} placeholder="+974 XXXX XXXX" />
+                <input id="cust-phone" className="form-input" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+974 XXXX XXXX" />
               </div>
               <div className="form-group">
                 <label className="form-label">Email</label>
-                <input id="cust-email" className="form-input" type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="email@example.com" />
+                <input id="cust-email" className="form-input" type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="email@example.com" />
               </div>
             </div>
             <div className="form-group">
               <label className="form-label">Address</label>
-              <textarea id="cust-address" className="form-textarea" value={form.address} onChange={e => setForm({...form, address: e.target.value})} placeholder="Street, City, Country" />
+              <textarea id="cust-address" className="form-textarea" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} placeholder="Street, City, Country" />
             </div>
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
             <button type="submit" className="btn btn-primary" disabled={saving} id="save-customer">
-              {saving ? '⏳ Saving...' : '💾 Save Customer'}
+              {saving ? <><IconClock style={{ marginRight: '8px' }} /> Saving...</> : <><IconSave style={{ marginRight: '8px' }} /> Save Customer</>}
             </button>
           </div>
         </form>
@@ -122,13 +123,13 @@ export default function CustomersPage() {
           <p className="section-subtitle">{customers.length} total customers</p>
         </div>
         <button id="add-customer-btn" className="btn btn-primary" onClick={() => { setEditCustomer(null); setModalOpen(true) }}>
-          ➕ Add Customer
+          <IconPlus style={{ marginRight: '8px' }} /> Add Customer
         </button>
       </div>
 
       <div className="toolbar">
         <div className="search-input-wrapper">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"><IconSearch /></span>
           <input
             id="customer-search"
             className="form-input search-input"
@@ -145,7 +146,7 @@ export default function CustomersPage() {
             <div style={{ textAlign: 'center', padding: '40px' }}><div className="spinner" style={{ margin: '0 auto' }} /></div>
           ) : customers.length === 0 ? (
             <div className="empty-state">
-              <div className="empty-state-icon">👥</div>
+              <div className="empty-state-icon"><IconCustomers size={48} /></div>
               <div className="empty-state-title">No customers found</div>
               <div className="empty-state-desc">Add your first customer to get started</div>
             </div>
@@ -177,9 +178,9 @@ export default function CustomersPage() {
                     </td>
                     <td>
                       <div className="table-actions">
-                        <button className="btn btn-sm btn-secondary" onClick={() => openHistory(c)} title="View purchase history">📄</button>
-                        <button className="btn btn-sm btn-secondary" onClick={() => { setEditCustomer(c); setModalOpen(true) }} title="Edit customer">✏️</button>
-                        <button className="btn btn-sm btn-danger" onClick={() => handleDelete(c.id, c.name)} title="Delete customer">🗑️</button>
+                        <button className="btn btn-sm btn-secondary" onClick={() => openHistory(c)} title="View purchase history"><IconInvoice /></button>
+                        <button className="btn btn-sm btn-secondary" onClick={() => { setEditCustomer(c); setModalOpen(true) }} title="Edit customer"><IconEdit /></button>
+                        <button className="btn btn-sm btn-danger" onClick={() => handleDelete(c.id, c.name)} title="Delete customer"><IconDelete /></button>
                       </div>
                     </td>
                   </tr>
@@ -198,7 +199,7 @@ export default function CustomersPage() {
         <div className="modal-overlay" onClick={() => setHistoryCustomer(null)}>
           <div className="modal modal-lg" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h2 className="modal-title">📄 Purchase History — {historyCustomer.name}</h2>
+              <h2 className="modal-title"><IconInvoice /> Purchase History — {historyCustomer.name}</h2>
               <button className="modal-close" onClick={() => setHistoryCustomer(null)}>×</button>
             </div>
             <div className="modal-body">
@@ -229,7 +230,7 @@ export default function CustomersPage() {
                 </div>
               ) : (
                 <div className="empty-state">
-                  <div className="empty-state-icon">📋</div>
+                  <div className="empty-state-icon"><IconInvoices size={48} /></div>
                   <div className="empty-state-title">No invoices yet</div>
                 </div>
               )}

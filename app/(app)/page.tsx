@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import { IconDashboard, IconInvoices, IconInventory, IconWarning, IconReports, IconCheck, IconClock, IconCurrency } from '@/components/Icons'
 
 interface DashboardData {
   todaySales: number
@@ -49,7 +50,7 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div className="stats-grid">
         <div className="stat-card" style={{ '--stat-color': '#c9973a', '--stat-bg': 'rgba(201,151,58,0.12)' } as React.CSSProperties}>
-          <div className="stat-icon">💰</div>
+          <div className="stat-icon"><IconCurrency size={28} /></div>
           <div className="stat-info">
             <div className="stat-value">{formatCurrency(data?.todaySales || 0)}</div>
             <div className="stat-label">Today's Revenue</div>
@@ -58,7 +59,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="stat-card" style={{ '--stat-color': '#3b82f6', '--stat-bg': 'rgba(59,130,246,0.1)' } as React.CSSProperties}>
-          <div className="stat-icon">📋</div>
+          <div className="stat-icon"><IconInvoices size={28} /></div>
           <div className="stat-info">
             <div className="stat-value">{data?.totalInvoices || 0}</div>
             <div className="stat-label">Total Invoices</div>
@@ -67,7 +68,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="stat-card" style={{ '--stat-color': '#10b981', '--stat-bg': 'rgba(16,185,129,0.1)' } as React.CSSProperties}>
-          <div className="stat-icon">🏠</div>
+          <div className="stat-icon"><IconInventory size={28} /></div>
           <div className="stat-info">
             <div className="stat-value">{data?.totalProducts || 0}</div>
             <div className="stat-label">Products in Stock</div>
@@ -76,7 +77,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="stat-card" style={{ '--stat-color': '#ef4444', '--stat-bg': 'rgba(239,68,68,0.1)' } as React.CSSProperties}>
-          <div className="stat-icon">⚠️</div>
+          <div className="stat-icon"><IconWarning size={28} /></div>
           <div className="stat-info">
             <div className="stat-value">{data?.lowStockProducts?.length || 0}</div>
             <div className="stat-label">Low Stock Alerts</div>
@@ -89,7 +90,7 @@ export default function DashboardPage() {
         {/* Monthly Sales Chart */}
         <div className="card">
           <div className="card-header">
-            <h2 className="card-title">📈 Monthly Revenue</h2>
+            <h2 className="card-title"><IconReports /> Monthly Revenue</h2>
             <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Last 6 months</span>
           </div>
           <div className="card-body">
@@ -98,7 +99,7 @@ export default function DashboardPage() {
                 <BarChart data={data?.monthly || []}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
                   <XAxis dataKey="month" tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} />
-                  <YAxis tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} tickFormatter={(v) => `${(v/1000).toFixed(0)}K`} />
+                  <YAxis tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`} />
                   <Tooltip
                     formatter={(value: number) => [formatCurrency(value), 'Revenue']}
                     contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-primary)' }}
@@ -113,7 +114,7 @@ export default function DashboardPage() {
         {/* Low Stock Alerts */}
         <div className="card">
           <div className="card-header">
-            <h2 className="card-title">🚨 Low Stock</h2>
+            <h2 className="card-title"><IconWarning /> Low Stock</h2>
             <a href="/products" style={{ fontSize: '12px', color: 'var(--brand-primary)', textDecoration: 'none', fontWeight: 600 }}>View all →</a>
           </div>
           <div className="card-body" style={{ padding: '12px' }}>
@@ -131,7 +132,7 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className="empty-state" style={{ padding: '30px 10px' }}>
-                <div className="empty-state-icon">✅</div>
+                <div className="empty-state-icon"><IconCheck size={32} /></div>
                 <div className="empty-state-title">All stocked up!</div>
                 <div className="empty-state-desc">No low stock items</div>
               </div>
@@ -143,7 +144,7 @@ export default function DashboardPage() {
       {/* Recent Invoices */}
       <div className="card">
         <div className="card-header">
-          <h2 className="card-title">🧾 Recent Invoices</h2>
+          <h2 className="card-title"><IconInvoices /> Recent Invoices</h2>
           <a href="/invoices" style={{ fontSize: '12px', color: 'var(--brand-primary)', textDecoration: 'none', fontWeight: 600 }}>View all →</a>
         </div>
         <div className="table-wrapper">
@@ -167,7 +168,7 @@ export default function DashboardPage() {
                     <td style={{ fontWeight: 700 }}>{formatCurrency(inv.total)}</td>
                     <td>
                       <span className={`badge ${inv.paymentStatus === 'Paid' ? 'badge-paid' : 'badge-pending'}`}>
-                        {inv.paymentStatus === 'Paid' ? '✓' : '⏳'} {inv.paymentStatus}
+                        {inv.paymentStatus === 'Paid' ? <IconCheck size={12} style={{ marginRight: '4px' }} /> : <IconClock size={12} style={{ marginRight: '4px' }} />} {inv.paymentStatus}
                       </span>
                     </td>
                   </tr>
@@ -176,7 +177,7 @@ export default function DashboardPage() {
                 <tr>
                   <td colSpan={5}>
                     <div className="empty-state">
-                      <div className="empty-state-icon">📋</div>
+                      <div className="empty-state-icon"><IconInvoices size={48} /></div>
                       <div className="empty-state-title">No invoices yet</div>
                       <div className="empty-state-desc"><a href="/billing" style={{ color: 'var(--brand-primary)' }}>Create your first invoice</a></div>
                     </div>

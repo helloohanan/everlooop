@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Suspense } from 'react'
 import Image from 'next/image'
+import { IconCheck, IconPrint, IconDownload, IconDelete, IconClock, IconPhone, IconEmail, IconLocation } from '@/components/Icons'
 
 interface Invoice {
   id: string
@@ -109,18 +110,16 @@ function InvoiceDetailContent({ id }: { id: string }) {
           <h1 className="section-title" style={{ marginTop: '4px' }}>{invoice.invoiceNumber}</h1>
         </div>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-          {invoice.paymentStatus === 'Pending' && (
-            <button
-              className="btn btn-success"
-              onClick={() => handleStatusUpdate('Paid')}
-              disabled={updating}
-              id="mark-paid-btn"
-            >
-              ✅ Mark as Paid
-            </button>
-          )}
-          <button className="btn btn-secondary" onClick={handlePrint} id="print-btn">🖨️ Print</button>
-          <button className="btn btn-primary" onClick={handlePrint} id="download-pdf-btn">⬇️ Download PDF</button>
+          <button
+            className="btn btn-success"
+            onClick={() => handleStatusUpdate('Paid')}
+            disabled={updating}
+            id="mark-paid-btn"
+          >
+            <IconCheck style={{ marginRight: '8px' }} /> Mark as Paid
+          </button>
+          <button className="btn btn-secondary" onClick={handlePrint} id="print-btn"><IconPrint style={{ marginRight: '8px' }} /> Print</button>
+          <button className="btn btn-primary" onClick={handlePrint} id="download-pdf-btn"><IconDownload style={{ marginRight: '8px' }} /> Download PDF</button>
           <button
             className="btn btn-secondary"
             onClick={handleDelete}
@@ -128,7 +127,7 @@ function InvoiceDetailContent({ id }: { id: string }) {
             style={{ color: '#ef4444', borderColor: '#ef4444' }}
             id="delete-invoice-btn"
           >
-            🗑️ Delete
+            <IconDelete style={{ marginRight: '8px' }} /> Delete
           </button>
         </div>
       </div>
@@ -166,7 +165,7 @@ function InvoiceDetailContent({ id }: { id: string }) {
                   background: invoice.paymentStatus === 'Paid' ? '#d1fae5' : '#fef3c7',
                   color: invoice.paymentStatus === 'Paid' ? '#065f46' : '#92400e',
                 }}>
-                  {invoice.paymentStatus === 'Paid' ? '✓ PAID' : '⏳ PENDING'}
+                  {invoice.paymentStatus === 'Paid' ? <><IconCheck size={10} style={{ marginRight: '4px' }} /> PAID</> : <><IconClock size={10} style={{ marginRight: '4px' }} /> PENDING</>}
                 </span>
               </div>
             </div>
@@ -178,9 +177,9 @@ function InvoiceDetailContent({ id }: { id: string }) {
           <div>
             <div style={{ fontSize: '10px', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Bill To</div>
             <div style={{ fontWeight: 700, fontSize: '15px', color: '#1a2744' }}>{invoice.customer.name}</div>
-            {invoice.customer.phone && <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '3px' }}>📞 {invoice.customer.phone}</div>}
-            {invoice.customer.email && <div style={{ fontSize: '12px', color: '#6b7280' }}>✉️ {invoice.customer.email}</div>}
-            {invoice.customer.address && <div style={{ fontSize: '12px', color: '#6b7280' }}>📍 {invoice.customer.address}</div>}
+            {invoice.customer.phone && <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px' }}><IconPhone size={12} /> {invoice.customer.phone}</div>}
+            {invoice.customer.email && <div style={{ fontSize: '12px', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}><IconEmail size={12} /> {invoice.customer.email}</div>}
+            {invoice.customer.address && <div style={{ fontSize: '12px', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}><IconLocation size={12} /> {invoice.customer.address}</div>}
           </div>
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: '10px', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Payment</div>
@@ -253,7 +252,7 @@ function InvoiceDetailContent({ id }: { id: string }) {
         )}
 
         <div style={{ marginTop: '32px', paddingTop: '20px', borderTop: '1px solid #e5e7eb', textAlign: 'center', fontSize: '12px', color: '#9ca3af' }}>
-          Thank you for choosing Ever Loop Carpets — Doha, Qatar 🇶🇦
+          Thank you for choosing Ever Loop Carpets — Doha, Qatar
         </div>
       </div>
 

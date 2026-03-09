@@ -4,22 +4,23 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useTheme } from '@/components/ThemeProvider'
 import { useState } from 'react'
+import { IconDashboard, IconInvoice, IconInvoices, IconCustomers, IconInventory, IconReports, IconSun, IconMoon, IconLogout } from '@/components/Icons'
 
 interface NavItem {
   href: string
-  icon: string
+  icon: React.ReactNode
   label: string
   badge?: number
   adminOnly?: boolean
 }
 
 const navItems: NavItem[] = [
-  { href: '/', icon: '📊', label: 'Dashboard' },
-  { href: '/billing', icon: '🧾', label: 'New Invoice' },
-  { href: '/invoices', icon: '📋', label: 'Invoices' },
-  { href: '/customers', icon: '👥', label: 'Customers' },
-  { href: '/products', icon: '🏠', label: 'Inventory' },
-  { href: '/reports', icon: '📈', label: 'Reports' },
+  { href: '/', icon: <IconDashboard />, label: 'Dashboard' },
+  { href: '/billing', icon: <IconInvoice />, label: 'New Invoice' },
+  { href: '/invoices', icon: <IconInvoices />, label: 'Invoices' },
+  { href: '/customers', icon: <IconCustomers />, label: 'Customers' },
+  { href: '/products', icon: <IconInventory />, label: 'Inventory' },
+  { href: '/reports', icon: <IconReports />, label: 'Reports' },
 ]
 
 interface SidebarProps {
@@ -81,7 +82,7 @@ export default function Sidebar({ user, lowStockCount = 0 }: SidebarProps) {
           className="nav-item"
           style={{ marginBottom: '8px' }}
         >
-          <span className="nav-item-icon">{theme === 'dark' ? '☀️' : '🌙'}</span>
+          <span className="nav-item-icon">{theme === 'dark' ? <IconSun /> : <IconMoon />}</span>
           <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
         </button>
 
@@ -103,7 +104,7 @@ export default function Sidebar({ user, lowStockCount = 0 }: SidebarProps) {
           className="nav-item"
           style={{ marginTop: '8px', color: '#ef4444' }}
         >
-          <span className="nav-item-icon">🚪</span>
+          <span className="nav-item-icon"><IconLogout /></span>
           <span>{loggingOut ? 'Logging out...' : 'Logout'}</span>
         </button>
       </div>

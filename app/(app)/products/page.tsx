@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
+import { IconEdit, IconPlus, IconWarning, IconImage, IconDelete, IconClock, IconSave, IconSearch, IconInventory, IconSize, IconX, IconCheck } from '@/components/Icons'
 
 interface Product {
   id: string
@@ -70,12 +71,12 @@ function ProductModal({ product, onClose, onSave }: {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal modal-lg" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 className="modal-title">{product ? '✏️ Edit Product' : '➕ Add Carpet Product'}</h2>
+          <h2 className="modal-title">{product ? <><IconEdit /> Edit Product</> : <><IconPlus /> Add Carpet Product</>}</h2>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {error && <div className="alert alert-danger">⚠️ {error}</div>}
+            {error && <div className="alert alert-danger"><IconWarning /> {error}</div>}
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Product ID *</label>
@@ -147,7 +148,7 @@ function ProductModal({ product, onClose, onSave }: {
                   />
                 ) : (
                   <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-                    <div style={{ fontSize: '36px', marginBottom: '4px' }}>🖼️</div>
+                    <div style={{ fontSize: '36px', marginBottom: '4px' }}><IconImage size={48} /></div>
                     <div style={{ fontSize: '13px', fontWeight: 600 }}>Click to select an image</div>
                     <div style={{ fontSize: '11px', marginTop: '2px' }}>JPG, PNG, WEBP supported</div>
                   </div>
@@ -159,7 +160,7 @@ function ProductModal({ product, onClose, onSave }: {
                     style={{ alignSelf: 'center' }}
                     onClick={e => { e.stopPropagation(); setImagePreview(''); setForm(f => ({ ...f, image: '' })) }}
                   >
-                    🗑️ Remove Image
+                    <IconDelete /> Remove Image
                   </button>
                 )}
               </div>
@@ -175,7 +176,7 @@ function ProductModal({ product, onClose, onSave }: {
           <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
             <button type="submit" className="btn btn-primary" disabled={saving} id="save-product">
-              {saving ? '⏳ Saving...' : '💾 Save Product'}
+              {saving ? <><IconClock style={{ marginRight: '8px' }} /> Saving...</> : <><IconSave style={{ marginRight: '8px' }} /> Save Product</>}
             </button>
           </div>
         </form>
@@ -226,13 +227,13 @@ export default function ProductsPage() {
           <p className="section-subtitle">{products.length} products</p>
         </div>
         <button id="add-product-btn" className="btn btn-primary" onClick={() => { setEditProduct(null); setModalOpen(true) }}>
-          ➕ Add Product
+          <IconPlus style={{ marginRight: '8px' }} /> Add Product
         </button>
       </div>
 
       <div className="toolbar">
         <div className="search-input-wrapper">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"><IconSearch /></span>
           <input
             id="product-search"
             className="form-input search-input"
@@ -258,7 +259,7 @@ export default function ProductsPage() {
       ) : products.length === 0 ? (
         <div className="card">
           <div className="empty-state">
-            <div className="empty-state-icon">🏠</div>
+            <div className="empty-state-icon"><IconInventory size={48} /></div>
             <div className="empty-state-title">No products found</div>
             <div className="empty-state-desc">Add your first carpet product</div>
           </div>
@@ -323,7 +324,7 @@ export default function ProductsPage() {
                       {p.image ? (
                         <img src={p.image} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       ) : (
-                        <span style={{ fontSize: '52px' }}>🏺</span>
+                        <IconInventory size={64} />
                       )}
                     </div>
 
@@ -335,7 +336,7 @@ export default function ProductsPage() {
                       </div>
 
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', fontSize: '12px', color: 'var(--text-muted)' }}>
-                        <span>📐 {p.size || '—'}</span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><IconSize /> {p.size || '—'}</span>
                         <span>•</span>
                         <span>{p.type}</span>
                         <span>•</span>
@@ -351,7 +352,7 @@ export default function ProductsPage() {
                       <div style={{ marginTop: 'auto', paddingTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ fontWeight: 700, fontSize: '14px' }}>{formatCurr(p.price)}</span>
                         <span className={`badge ${getStockLevel(p.stock, p.lowStock)}`} style={{ fontSize: '11px' }}>
-                          {p.stock === 0 ? '❌ Out of Stock' : p.stock <= p.lowStock ? `⚠️ Low (${p.stock})` : `✓ ${p.stock}`}
+                          {p.stock === 0 ? <><IconX size={12} /> Out of Stock</> : p.stock <= p.lowStock ? <><IconWarning size={12} /> Low ({p.stock})</> : <><IconCheck size={12} /> {p.stock}</>}
                         </span>
                       </div>
                     </div>
@@ -380,7 +381,7 @@ export default function ProductsPage() {
                       style={{ width: '100%', padding: '12px' }}
                       onClick={(e) => { e.stopPropagation(); setEditProduct(p); setModalOpen(true); }}
                     >
-                      ✏️ Edit Product
+                      <IconEdit /> Edit Product
                     </button>
 
                     <button
@@ -388,7 +389,7 @@ export default function ProductsPage() {
                       style={{ width: '100%', padding: '12px' }}
                       onClick={(e) => { e.stopPropagation(); handleDelete(p.id, p.name); }}
                     >
-                      🗑️ Delete Product
+                      <IconDelete /> Delete Product
                     </button>
 
                     <button

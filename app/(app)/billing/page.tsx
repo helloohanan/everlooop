@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { IconWarning, IconCustomers, IconPhone, IconEmail, IconLocation, IconSearch, IconInventory, IconDashboard, IconInvoice, IconCurrency, IconCheck, IconClock, IconX } from '@/components/Icons'
 
 interface Customer { id: string; name: string; phone?: string; email?: string; address?: string }
 interface Product { id: string; productId: string; name: string; type: string; size: string; material: string; price: number; stock: number }
@@ -114,7 +115,7 @@ export default function BillingPage() {
         </div>
       </div>
 
-      {error && <div className="alert alert-danger">⚠️ {error}</div>}
+      {error && <div className="alert alert-danger"><IconWarning /> {error}</div>}
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '20px' }}>
         {/* LEFT: Customer + Products */}
@@ -123,26 +124,28 @@ export default function BillingPage() {
           {/* Customer selection */}
           <div className="card">
             <div className="card-header">
-              <h2 className="card-title">👤 Customer</h2>
+              <h2 className="card-title"><IconCustomers /> Customer</h2>
             </div>
             <div className="card-body">
               {selectedCustomer ? (
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: '16px' }}>{selectedCustomer.name}</div>
-                    {selectedCustomer.phone && <div style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>📞 {selectedCustomer.phone}</div>}
-                    {selectedCustomer.email && <div style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>✉️ {selectedCustomer.email}</div>}
-                    {selectedCustomer.address && <div style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>📍 {selectedCustomer.address}</div>}
+                    {selectedCustomer.phone && <div style={{ color: 'var(--text-secondary)', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}><IconPhone /> {selectedCustomer.phone}</div>}
+                    {selectedCustomer.email && <div style={{ color: 'var(--text-secondary)', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}><IconEmail /> {selectedCustomer.email}</div>}
+                    {selectedCustomer.address && <div style={{ color: 'var(--text-secondary)', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}><IconLocation /> {selectedCustomer.address}</div>}
                   </div>
                   <button className="btn btn-sm btn-secondary" onClick={() => setSelectedCustomer(null)}>Change</button>
                 </div>
               ) : (
                 <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}><IconSearch /></div>
                   <input
                     id="customer-search-billing"
                     className="form-input"
-                    placeholder="🔍 Search customer by name or phone..."
+                    placeholder="Search customer by name or phone..."
                     value={customerSearch}
+                    style={{ paddingLeft: '44px' }}
                     onChange={e => { setCustomerSearch(e.target.value); setShowCustomerDrop(true) }}
                     onFocus={() => setShowCustomerDrop(true)}
                   />
@@ -173,16 +176,18 @@ export default function BillingPage() {
           {/* Products */}
           <div className="card">
             <div className="card-header">
-              <h2 className="card-title">🏺 Carpet Items</h2>
+              <h2 className="card-title"><IconInventory /> Carpet Items</h2>
             </div>
             <div className="card-body">
               {/* Product search */}
               <div style={{ position: 'relative', marginBottom: '16px' }}>
+                <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}><IconSearch /></div>
                 <input
                   id="product-search-billing"
                   className="form-input"
-                  placeholder="🔍 Search and add carpet products..."
+                  placeholder="Search and add carpet products..."
                   value={productSearch}
+                  style={{ paddingLeft: '44px' }}
                   onChange={e => { setProductSearch(e.target.value); setShowProductDrop(true) }}
                   onFocus={() => setShowProductDrop(true)}
                 />
@@ -213,7 +218,7 @@ export default function BillingPage() {
               {/* Items table */}
               {items.length === 0 ? (
                 <div className="empty-state" style={{ padding: '30px' }}>
-                  <div className="empty-state-icon">🏺</div>
+                  <div className="empty-state-icon"><IconInventory size={48} /></div>
                   <div className="empty-state-title">No items added</div>
                   <div className="empty-state-desc">Search and select carpet products above</div>
                 </div>
@@ -263,7 +268,7 @@ export default function BillingPage() {
                             <button
                               className="btn btn-sm btn-danger btn-icon"
                               onClick={() => setItems(items.filter(i => i.productId !== item.productId))}
-                            >×</button>
+                            ><IconX /></button>
                           </td>
                         </tr>
                       ))}
@@ -281,7 +286,7 @@ export default function BillingPage() {
           {/* Order Summary */}
           <div className="card">
             <div className="card-header">
-              <h2 className="card-title">🧮 Order Summary</h2>
+              <h2 className="card-title"><IconDashboard /> Order Summary</h2>
             </div>
             <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -327,22 +332,22 @@ export default function BillingPage() {
           {/* Payment Options */}
           <div className="card">
             <div className="card-header">
-              <h2 className="card-title">💳 Payment</h2>
+              <h2 className="card-title"><IconInvoice /> Payment</h2>
             </div>
             <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div className="form-group">
                 <label className="form-label">Payment Method</label>
                 <select id="payment-method" className="form-select" value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
-                  <option value="Cash">💵 Cash</option>
-                  <option value="Card">💳 Card</option>
-                  <option value="Bank Transfer">🏦 Bank Transfer</option>
+                  <option value="Cash">Cash</option>
+                  <option value="Card">Card</option>
+                  <option value="Bank Transfer">Bank Transfer</option>
                 </select>
               </div>
               <div className="form-group">
                 <label className="form-label">Payment Status</label>
                 <select id="payment-status" className="form-select" value={paymentStatus} onChange={e => setPaymentStatus(e.target.value)}>
-                  <option value="Paid">✅ Paid</option>
-                  <option value="Pending">⏳ Pending</option>
+                  <option value="Paid">Paid</option>
+                  <option value="Pending">Pending</option>
                 </select>
               </div>
               <div className="form-group">
@@ -360,7 +365,7 @@ export default function BillingPage() {
             disabled={saving || items.length === 0 || !selectedCustomer}
             style={{ padding: '14px', fontSize: '15px', justifyContent: 'center' }}
           >
-            {saving ? '⏳ Creating Invoice...' : '🧾 Create Invoice'}
+            {saving ? <><IconClock style={{ marginRight: '8px' }} /> Creating Invoice...</> : <><IconInvoice style={{ marginRight: '8px' }} /> Create Invoice</>}
           </button>
         </div>
       </div>

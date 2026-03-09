@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { IconWarning, IconClock, IconLock } from '@/components/Icons'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { ThemeProvider } from '@/components/ThemeProvider'
@@ -78,7 +79,7 @@ function LoginForm() {
             />
           </div>
 
-          {error && <div className="login-error">⚠️ {error}</div>}
+          {error && <div className="login-error"><IconWarning style={{ marginRight: '8px' }} /> {error}</div>}
 
           <button
             type="submit"
@@ -86,7 +87,7 @@ function LoginForm() {
             className="login-btn"
             id="login-submit"
           >
-            {loading ? '🔄 Signing in...' : '🔐 Sign In'}
+            {loading ? <><IconClock style={{ marginRight: '8px' }} /> Signing in...</> : <><IconLock style={{ marginRight: '8px' }} /> Sign In</>}
           </button>
         </form>
 

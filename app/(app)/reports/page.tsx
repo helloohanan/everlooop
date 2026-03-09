@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
+import { IconCurrency, IconInvoices, IconInvoice, IconReports, IconAward, IconMedal } from '@/components/Icons'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
 
 interface ReportData {
@@ -66,7 +67,7 @@ export default function ReportsPage() {
           {/* Summary Stats */}
           <div className="stats-grid">
             <div className="stat-card" style={{ '--stat-color': '#c9973a', '--stat-bg': 'rgba(201,151,58,0.12)' } as React.CSSProperties}>
-              <div className="stat-icon">💰</div>
+              <div className="stat-icon"><IconCurrency /></div>
               <div className="stat-info">
                 <div className="stat-value" style={{ fontSize: '18px' }}>{formatQAR(data.totalRevenue)}</div>
                 <div className="stat-label">Total Revenue</div>
@@ -74,7 +75,7 @@ export default function ReportsPage() {
               </div>
             </div>
             <div className="stat-card" style={{ '--stat-color': '#3b82f6', '--stat-bg': 'rgba(59,130,246,0.1)' } as React.CSSProperties}>
-              <div className="stat-icon">📋</div>
+              <div className="stat-icon"><IconInvoices /></div>
               <div className="stat-info">
                 <div className="stat-value">{data.totalInvoices}</div>
                 <div className="stat-label">Total Invoices</div>
@@ -82,7 +83,7 @@ export default function ReportsPage() {
               </div>
             </div>
             <div className="stat-card" style={{ '--stat-color': '#10b981', '--stat-bg': 'rgba(16,185,129,0.1)' } as React.CSSProperties}>
-              <div className="stat-icon">🧾</div>
+              <div className="stat-icon"><IconInvoice /></div>
               <div className="stat-info">
                 <div className="stat-value" style={{ fontSize: '18px' }}>{formatQAR(data.totalVAT)}</div>
                 <div className="stat-label">VAT Collected (5%)</div>
@@ -90,7 +91,7 @@ export default function ReportsPage() {
               </div>
             </div>
             <div className="stat-card" style={{ '--stat-color': '#f59e0b', '--stat-bg': 'rgba(245,158,11,0.1)' } as React.CSSProperties}>
-              <div className="stat-icon">📊</div>
+              <div className="stat-icon"><IconReports /></div>
               <div className="stat-info">
                 <div className="stat-value" style={{ fontSize: '18px' }}>
                   {data.totalInvoices > 0 ? formatQAR(data.totalRevenue / data.totalInvoices) : 'QAR 0'}
@@ -105,12 +106,12 @@ export default function ReportsPage() {
             {/* Top Products */}
             <div className="card">
               <div className="card-header">
-                <h2 className="card-title">🏆 Best-Selling Carpets</h2>
+                <h2 className="card-title"><IconAward /> Best-Selling Carpets</h2>
                 <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{periodLabel}</span>
               </div>
               <div className="card-body" style={{ padding: 0 }}>
                 {data.topProducts.length === 0 ? (
-                  <div className="empty-state"><div className="empty-state-icon">📊</div><div className="empty-state-title">No sales data</div></div>
+                  <div className="empty-state"><div className="empty-state-icon"><IconReports size={48} /></div><div className="empty-state-title">No sales data</div></div>
                 ) : (
                   <table>
                     <thead>
@@ -127,7 +128,7 @@ export default function ReportsPage() {
                         <tr key={i}>
                           <td>
                             <span style={{ fontWeight: 800, color: i === 0 ? '#c9973a' : i === 1 ? '#9ca3af' : i === 2 ? '#a78b6c' : 'var(--text-muted)' }}>
-                              {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
+                              {i === 0 ? <IconMedal style={{ color: '#c9973a' }} /> : i === 1 ? <IconMedal style={{ color: '#9ca3af' }} /> : i === 2 ? <IconMedal style={{ color: '#a78b6c' }} /> : `#${i + 1}`}
                             </span>
                           </td>
                           <td style={{ fontWeight: 600 }}>{p.name}</td>
@@ -145,11 +146,11 @@ export default function ReportsPage() {
             {/* Payment Method Chart */}
             <div className="card">
               <div className="card-header">
-                <h2 className="card-title">💳 Payment Methods</h2>
+                <h2 className="card-title"><IconInvoice /> Payment Methods</h2>
               </div>
               <div className="card-body">
                 {pieData.length === 0 ? (
-                  <div className="empty-state"><div className="empty-state-icon">📊</div><div className="empty-state-title">No data</div></div>
+                  <div className="empty-state"><div className="empty-state-icon"><IconReports size={48} /></div><div className="empty-state-title">No data</div></div>
                 ) : (
                   <>
                     <div style={{ height: '200px' }}>
@@ -182,11 +183,11 @@ export default function ReportsPage() {
           {/* Recent Invoices Table */}
           <div className="card">
             <div className="card-header">
-              <h2 className="card-title">📋 Recent Invoices — {periodLabel}</h2>
+              <h2 className="card-title"><IconInvoices /> Recent Invoices — {periodLabel}</h2>
             </div>
             <div className="table-wrapper">
               {data.invoices.length === 0 ? (
-                <div className="empty-state"><div className="empty-state-icon">📋</div><div className="empty-state-title">No invoices in this period</div></div>
+                <div className="empty-state"><div className="empty-state-icon"><IconInvoices size={48} /></div><div className="empty-state-title">No invoices in this period</div></div>
               ) : (
                 <table>
                   <thead>
