@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Suspense } from 'react'
 import Image from 'next/image'
 
@@ -38,6 +38,7 @@ function InvoiceDetailContent({ id }: { id: string }) {
   const [updating, setUpdating] = useState(false)
   const printRef = useRef<HTMLDivElement>(null)
   const searchParams = useSearchParams()
+  const router = useRouter()
 
   useEffect(() => {
     fetch(`/api/invoices/${id}`)
@@ -65,6 +66,26 @@ function InvoiceDetailContent({ id }: { id: string }) {
     const data = await res.json()
     if (res.ok) setInvoice({ ...invoice, paymentStatus: status })
     setUpdating(false)
+  }
+
+  const handleDelete = async () => {
+    if (!invoice || !confirm(`Are you sure you want to delete invoice ${invoice.invoiceNumber}?`)) return
+
+    setUpdating(true)
+    try {
+      const res = await fetch(`/api/invoices/${invoice.id}`, { method: 'DELETE' })
+      if (res.ok) {
+        router.push('/invoices')
+        router.refresh()
+      } else {
+        alert('Failed to delete invoice')
+        setUpdating(false)
+      }
+    } catch (err) {
+      console.error('Delete error:', err)
+      alert('Error deleting invoice')
+      setUpdating(false)
+    }
   }
 
   if (loading) {
@@ -100,10 +121,19 @@ function InvoiceDetailContent({ id }: { id: string }) {
           )}
           <button className="btn btn-secondary" onClick={handlePrint} id="print-btn">🖨️ Print</button>
           <button className="btn btn-primary" onClick={handlePrint} id="download-pdf-btn">⬇️ Download PDF</button>
+          <button
+            className="btn btn-secondary"
+            onClick={handleDelete}
+            disabled={updating}
+            style={{ color: '#ef4444', borderColor: '#ef4444' }}
+            id="delete-invoice-btn"
+          >
+            🗑️ Delete
+          </button>
         </div>
       </div>
 
-        {/* Invoice Document */}
+      {/* Invoice Document */}
       <div ref={printRef} className="invoice-preview" id="invoice-document">
         {/* Header */}
         <div className="invoice-header">

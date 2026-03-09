@@ -29,14 +29,29 @@ export async function PUT(
     const { id } = await params
     const body = await request.json()
     const { paymentStatus, paymentMethod } = body
-    
+
     const invoice = await prisma.invoice.update({
       where: { id },
       data: { paymentStatus, paymentMethod },
     })
-    
+
     return NextResponse.json(invoice)
   } catch {
+    return NextResponse.json({ error: 'Server error' }, { status: 500 })
+  }
+}
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+    await prisma.invoice.delete({
+      where: { id },
+    })
+    return NextResponse.json({ success: true })
+  } catch (err) {
+    console.error('Delete invoice error:', err)
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }

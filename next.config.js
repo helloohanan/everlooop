@@ -3,7 +3,9 @@ const nextConfig = {
   images: {
     remotePatterns: [],
   },
-  serverExternalPackages: ['bcryptjs'],
+  experimental: {
+    serverComponentsExternalPackages: ['bcryptjs'],
+  },
 }
 
 module.exports = nextConfig

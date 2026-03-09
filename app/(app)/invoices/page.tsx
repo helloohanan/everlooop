@@ -28,6 +28,22 @@ export default function InvoicesPage() {
     setLoading(false)
   }, [search, statusFilter])
 
+  const handleDelete = async (id: string, num: string) => {
+    if (!confirm(`Are you sure you want to delete invoice ${num}?`)) return
+
+    try {
+      const res = await fetch(`/api/invoices/${id}`, { method: 'DELETE' })
+      if (res.ok) {
+        load()
+      } else {
+        alert('Failed to delete invoice')
+      }
+    } catch (err) {
+      console.error('Delete error:', err)
+      alert('Error deleting invoice')
+    }
+  }
+
   useEffect(() => { load() }, [load])
 
   return (
@@ -115,6 +131,14 @@ export default function InvoicesPage() {
                       <div className="table-actions">
                         <a href={`/invoices/${inv.id}`} className="btn btn-sm btn-secondary" title="View invoice">👁️</a>
                         <a href={`/invoices/${inv.id}?print=true`} className="btn btn-sm btn-secondary" title="Print">🖨️</a>
+                        <button
+                          onClick={() => handleDelete(inv.id, inv.invoiceNumber)}
+                          className="btn btn-sm btn-secondary"
+                          title="Delete"
+                          style={{ color: 'var(--brand-danger)' }}
+                        >
+                          🗑️
+                        </button>
                       </div>
                     </td>
                   </tr>

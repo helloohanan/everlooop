@@ -79,27 +79,27 @@ function ProductModal({ product, onClose, onSave }: {
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Product ID *</label>
-                <input id="prod-id" className="form-input" value={form.productId} onChange={e => setForm({...form, productId: e.target.value})} required placeholder="EL-1001" disabled={!!product} />
+                <input id="prod-id" className="form-input" value={form.productId} onChange={e => setForm({ ...form, productId: e.target.value })} required placeholder="EL-1001" disabled={!!product} />
               </div>
               <div className="form-group">
                 <label className="form-label">Carpet Name *</label>
-                <input id="prod-name" className="form-input" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required placeholder="e.g. Royal Persian Medallion" />
+                <input id="prod-name" className="form-input" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required placeholder="e.g. Royal Persian Medallion" />
               </div>
             </div>
             <div className="form-row-3">
               <div className="form-group">
                 <label className="form-label">Carpet Type</label>
-                <select id="prod-type" className="form-select" value={form.type} onChange={e => setForm({...form, type: e.target.value})}>
+                <select id="prod-type" className="form-select" value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
                   {TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
               <div className="form-group">
                 <label className="form-label">Size</label>
-                <input id="prod-size" className="form-input" value={form.size} onChange={e => setForm({...form, size: e.target.value})} placeholder="e.g. 5x7, 8x10" />
+                <input id="prod-size" className="form-input" value={form.size} onChange={e => setForm({ ...form, size: e.target.value })} placeholder="e.g. 5x7, 8x10" />
               </div>
               <div className="form-group">
                 <label className="form-label">Material</label>
-                <select id="prod-material" className="form-select" value={form.material} onChange={e => setForm({...form, material: e.target.value})}>
+                <select id="prod-material" className="form-select" value={form.material} onChange={e => setForm({ ...form, material: e.target.value })}>
                   {MATERIALS.map(m => <option key={m} value={m}>{m}</option>)}
                 </select>
               </div>
@@ -107,20 +107,20 @@ function ProductModal({ product, onClose, onSave }: {
             <div className="form-row-3">
               <div className="form-group">
                 <label className="form-label">Price (QAR) *</label>
-                <input id="prod-price" className="form-input" type="number" min="0" step="0.01" value={form.price} onChange={e => setForm({...form, price: e.target.value})} required placeholder="0.00" />
+                <input id="prod-price" className="form-input" type="number" min="0" step="0.01" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} required placeholder="0.00" />
               </div>
               <div className="form-group">
                 <label className="form-label">Stock Quantity</label>
-                <input id="prod-stock" className="form-input" type="number" min="0" value={form.stock} onChange={e => setForm({...form, stock: e.target.value})} />
+                <input id="prod-stock" className="form-input" type="number" min="0" value={form.stock} onChange={e => setForm({ ...form, stock: e.target.value })} />
               </div>
               <div className="form-group">
                 <label className="form-label">Low Stock Alert</label>
-                <input id="prod-lowstock" className="form-input" type="number" min="0" value={form.lowStock} onChange={e => setForm({...form, lowStock: e.target.value})} />
+                <input id="prod-lowstock" className="form-input" type="number" min="0" value={form.lowStock} onChange={e => setForm({ ...form, lowStock: e.target.value })} />
               </div>
             </div>
             <div className="form-group">
               <label className="form-label">Description</label>
-              <textarea id="prod-desc" className="form-textarea" value={form.description} onChange={e => setForm({...form, description: e.target.value})} placeholder="Carpet details, origin, craftsmanship..." />
+              <textarea id="prod-desc" className="form-textarea" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Carpet details, origin, craftsmanship..." />
             </div>
             <div className="form-group">
               <label className="form-label">Product Image (optional)</label>
@@ -191,6 +191,7 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [editProduct, setEditProduct] = useState<Product | null>(null)
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -268,53 +269,140 @@ export default function ProductsPage() {
           gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
           gap: '20px',
         }}>
-          {products.map(p => (
-            <div key={p.id} className="card" style={{ display: 'flex', flexDirection: 'column', padding: 0, overflow: 'hidden' }}>
-              {/* Image */}
-              <div style={{ width: '100%', height: '160px', background: 'var(--bg-table-header)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                {p.image ? (
-                  <img src={p.image} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  <span style={{ fontSize: '52px' }}>🏺</span>
-                )}
-              </div>
+          {products.map(p => {
+            const isSelected = selectedProductId === p.id
+            return (
+              <div
+                key={p.id}
+                className={`card flip-card ${isSelected ? 'flipped' : ''}`}
+                onClick={() => setSelectedProductId(isSelected ? null : p.id)}
+                style={{
+                  padding: 0,
+                  overflow: 'visible', // Must be visible for 3D flip
+                  cursor: 'pointer',
+                  perspective: '1000px', // 3D perspective
+                  backgroundColor: 'transparent', // Let inner faces handle bg
+                  border: 'none',
+                  boxShadow: 'none',
+                  height: '380px' // Fixed height to maintain grid
+                }}
+              >
+                <div
+                  className="flip-card-inner"
+                  style={{
+                    position: 'relative',
+                    width: '100%',
+                    height: '100%',
+                    textAlign: 'center',
+                    transition: 'transform 0.6s',
+                    transformStyle: 'preserve-3d',
+                    transform: isSelected ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                    boxShadow: isSelected ? '0 0 0 2px rgba(139, 92, 246, 0.4)' : 'var(--shadow-sm)',
+                    borderRadius: '12px'
+                  }}
+                >
+                  {/* Front Face */}
+                  <div
+                    className="flip-card-front"
+                    style={{
+                      position: 'absolute',
+                      width: '100%',
+                      height: '100%',
+                      backfaceVisibility: 'hidden',
+                      backgroundColor: 'var(--bg-card)',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      overflow: 'hidden',
+                      border: '1px solid var(--border-color)',
+                      transform: 'rotateY(0deg)'
+                    }}
+                  >
+                    {/* Image */}
+                    <div style={{ width: '100%', height: '160px', background: 'var(--bg-table-header)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      {p.image ? (
+                        <img src={p.image} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <span style={{ fontSize: '52px' }}>🏺</span>
+                      )}
+                    </div>
 
-              {/* Body */}
-              <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '2px' }}>{p.name}</div>
-                  <code style={{ fontSize: '11px', background: 'var(--bg-table-header)', padding: '2px 7px', borderRadius: '4px', color: 'var(--text-muted)' }}>{p.productId}</code>
-                </div>
+                    {/* Body */}
+                    <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '2px' }}>{p.name}</div>
+                        <code style={{ fontSize: '11px', background: 'var(--bg-table-header)', padding: '2px 7px', borderRadius: '4px', color: 'var(--text-muted)' }}>{p.productId}</code>
+                      </div>
 
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', fontSize: '12px', color: 'var(--text-muted)' }}>
-                  <span>📐 {p.size || '—'}</span>
-                  <span>•</span>
-                  <span>{p.type}</span>
-                  <span>•</span>
-                  <span>{p.material}</span>
-                </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', fontSize: '12px', color: 'var(--text-muted)' }}>
+                        <span>📐 {p.size || '—'}</span>
+                        <span>•</span>
+                        <span>{p.type}</span>
+                        <span>•</span>
+                        <span>{p.material}</span>
+                      </div>
 
-                {p.description && (
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {p.description}
-                  </div>
-                )}
+                      {p.description && (
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {p.description}
+                        </div>
+                      )}
 
-                <div style={{ marginTop: 'auto', paddingTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontWeight: 700, fontSize: '14px' }}>{formatCurr(p.price)}</span>
-                  <span className={`badge ${getStockLevel(p.stock, p.lowStock)}`} style={{ fontSize: '11px' }}>
-                    {p.stock === 0 ? '❌ Out of Stock' : p.stock <= p.lowStock ? `⚠️ Low (${p.stock})` : `✓ ${p.stock}`}
-                  </span>
-                </div>
-              </div>
+                      <div style={{ marginTop: 'auto', paddingTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontWeight: 700, fontSize: '14px' }}>{formatCurr(p.price)}</span>
+                        <span className={`badge ${getStockLevel(p.stock, p.lowStock)}`} style={{ fontSize: '11px' }}>
+                          {p.stock === 0 ? '❌ Out of Stock' : p.stock <= p.lowStock ? `⚠️ Low (${p.stock})` : `✓ ${p.stock}`}
+                        </span>
+                      </div>
+                    </div>
+                  </div> {/* End of flip-card-front */}
 
-              {/* Footer actions */}
-              <div style={{ padding: '10px 16px', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '8px' }}>
-                <button className="btn btn-sm btn-secondary" style={{ flex: 1 }} onClick={() => { setEditProduct(p); setModalOpen(true) }}>✏️ Edit</button>
-                <button className="btn btn-sm btn-danger" style={{ flex: 1 }} onClick={() => handleDelete(p.id, p.name)}>🗑️ Delete</button>
-              </div>
-            </div>
-          ))}
+                  {/* Back Face */}
+                  <div
+                    className="flip-card-back"
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '16px',
+                      padding: '24px',
+                      border: '1px solid var(--primary-color)',
+                      boxShadow: 'inset 0 0 20px rgba(0,0,0,0.05)',
+                      borderRadius: '12px'
+                    }}
+                  >
+                    <h3 style={{ margin: 0, color: 'var(--text-color)', fontSize: '18px' }}>{p.name}</h3>
+                    <div style={{ color: 'var(--text-muted)', fontSize: '13px', marginBottom: '8px' }}>{p.productId}</div>
+
+                    <button
+                      className="btn btn-primary"
+                      style={{ width: '100%', padding: '12px' }}
+                      onClick={(e) => { e.stopPropagation(); setEditProduct(p); setModalOpen(true); }}
+                    >
+                      ✏️ Edit Product
+                    </button>
+
+                    <button
+                      className="btn btn-danger"
+                      style={{ width: '100%', padding: '12px' }}
+                      onClick={(e) => { e.stopPropagation(); handleDelete(p.id, p.name); }}
+                    >
+                      🗑️ Delete Product
+                    </button>
+
+                    <button
+                      className="btn btn-secondary"
+                      style={{ width: '100%', marginTop: 'auto', padding: '10px' }}
+                      onClick={(e) => { e.stopPropagation(); setSelectedProductId(null); }}
+                    >
+                      Cancel
+                    </button>
+                  </div> {/* End of flip-card-back */}
+                </div> {/* End of flip-card-inner */}
+              </div> // End of flip-card
+            )
+          })}
         </div>
       )}
 

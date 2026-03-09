@@ -49,7 +49,7 @@ export default function Sidebar({ user, lowStockCount = 0 }: SidebarProps) {
             alt="Ever Loop Carpets"
             width={200}
             height={70}
-            style={{ width: '100%', maxWidth: '200px', height: 'auto', objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
+            style={{ width: '100%', maxWidth: '200px', height: 'auto', objectFit: 'contain', filter: theme === 'dark' ? 'brightness(0) invert(1)' : 'none' }}
             priority
           />
         </Link>
