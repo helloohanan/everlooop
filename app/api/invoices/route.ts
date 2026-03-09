@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     // Validate products and calculate totals
     let subtotal = 0
-    const validatedItems: { productId: string; quantity: number; price: number; total: number }[] = []
+    const validatedItems: { productId: string; quantity: number; price: number; size?: string; total: number }[] = []
 
     for (const item of items) {
       const product = await prisma.product.findUnique({ where: { id: item.productId } })
@@ -61,7 +61,13 @@ export async function POST(request: NextRequest) {
       const itemPrice = typeof item.price === 'number' ? item.price : product.price
       const total = itemPrice * item.quantity
       subtotal += total
-      validatedItems.push({ productId: item.productId, quantity: item.quantity, price: itemPrice, total })
+      validatedItems.push({
+        productId: item.productId,
+        quantity: item.quantity,
+        price: itemPrice,
+        size: item.size || product.size,
+        total
+      })
     }
 
     const discountAmount = discount || 0

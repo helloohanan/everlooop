@@ -20,7 +20,7 @@ interface Invoice {
     name: string; phone?: string; email?: string; address?: string
   }
   items: {
-    id: string; quantity: number; price: number; total: number;
+    id: string; quantity: number; price: number; size: string; total: number;
     product: { name: string; productId: string; type: string; size: string; material: string }
   }[]
 }
@@ -210,7 +210,7 @@ function InvoiceDetailContent({ id }: { id: string }) {
                   <div style={{ fontSize: '11px', color: '#9ca3af' }}>{item.product.productId}</div>
                 </td>
                 <td style={{ fontSize: '12px', color: '#6b7280' }}>
-                  {item.product.type} · {item.product.size} · {item.product.material}
+                  {item.product.type} · {item.size || item.product.size} · {item.product.material}
                 </td>
                 <td style={{ textAlign: 'center', fontWeight: 600 }}>{item.quantity}</td>
                 <td style={{ textAlign: 'right' }}>{formatQAR(item.price)}</td>

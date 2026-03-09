@@ -5,7 +5,7 @@ import { IconWarning, IconCustomers, IconPhone, IconEmail, IconLocation, IconSea
 
 interface Customer { id: string; name: string; phone?: string; email?: string; address?: string }
 interface Product { id: string; productId: string; name: string; type: string; size: string; material: string; price: number; stock: number }
-interface LineItem { productId: string; product: Product; quantity: number; price: number; total: number }
+interface LineItem { productId: string; product: Product; quantity: number; price: number; size: string; total: number }
 
 export default function BillingPage() {
   const router = useRouter()
@@ -49,8 +49,32 @@ export default function BillingPage() {
         : i
       ))
     } else {
-      setItems([...items, { productId: p.id, product: p, quantity: 1, price: p.price, total: p.price }])
+      setItems([...items, { productId: p.id, product: p, quantity: 1, price: p.price, size: p.size, total: p.price }])
     }
+  }
+
+  const parseSize = (s: string) => {
+    const match = s.match(/^(\d+(?:\.\d+)?)\s*[x*]\s*(\d+(?:\.\d+)?)$/i)
+    if (match) return { w: parseFloat(match[1]), l: parseFloat(match[2]) }
+    return null
+  }
+
+  const updateSize = (productId: string, newSize: string) => {
+    setItems(items.map(item => {
+      if (item.productId !== productId) return item
+
+      let newPrice = item.price
+      const newS = parseSize(newSize)
+      const origS = parseSize(item.product.size)
+
+      if (newS && origS) {
+        const newArea = newS.w * newS.l
+        const origArea = origS.w * origS.l
+        newPrice = (newArea / origArea) * item.product.price
+      }
+
+      return { ...item, size: newSize, price: newPrice, total: newPrice * item.quantity }
+    }))
   }
 
   const updateQty = (productId: string, qty: number) => {
@@ -88,7 +112,7 @@ export default function BillingPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customerId: selectedCustomer.id,
-          items: items.map(i => ({ productId: i.productId, quantity: i.quantity, price: i.price })),
+          items: items.map(i => ({ productId: i.productId, quantity: i.quantity, price: i.price, size: i.size })),
           discount: parseFloat(discount) || 0,
           paymentMethod,
           paymentStatus,
@@ -227,6 +251,7 @@ export default function BillingPage() {
                     <thead>
                       <tr>
                         <th>Product</th>
+                        <th style={{ width: '100px' }}>Size</th>
                         <th style={{ width: '90px' }}>Price (QAR)</th>
                         <th style={{ width: '80px' }}>Qty</th>
                         <th style={{ width: '120px' }}>Total</th>
@@ -238,7 +263,17 @@ export default function BillingPage() {
                         <tr key={item.productId}>
                           <td>
                             <div style={{ fontWeight: 600, fontSize: '13px' }}>{item.product.name}</div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{item.product.productId} · {item.product.type} · {item.product.size}</div>
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{item.product.productId} · {item.product.type}</div>
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              value={item.size}
+                              onChange={e => updateSize(item.productId, e.target.value)}
+                              className="form-input"
+                              placeholder="e.g. 5x7"
+                              style={{ width: '100px', padding: '4px 8px', fontSize: '13px' }}
+                            />
                           </td>
                           <td>
                             <input
