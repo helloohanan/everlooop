@@ -57,15 +57,17 @@ export async function POST(request: NextRequest) {
       if (product.stock < item.quantity) {
         return NextResponse.json({ error: `Insufficient stock for ${product.name}. Available: ${product.stock}` }, { status: 400 })
       }
-      const total = product.price * item.quantity
+      // Use provided price or fall back to product price
+      const itemPrice = typeof item.price === 'number' ? item.price : product.price
+      const total = itemPrice * item.quantity
       subtotal += total
-      validatedItems.push({ productId: item.productId, quantity: item.quantity, price: product.price, total })
+      validatedItems.push({ productId: item.productId, quantity: item.quantity, price: itemPrice, total })
     }
 
-    const discountAmount = (subtotal * (discount || 0)) / 100
+    const discountAmount = discount || 0
     const afterDiscount = subtotal - discountAmount
-    const vat = afterDiscount * 0.05
-    const total = afterDiscount + vat
+    const vat = 0
+    const total = afterDiscount
 
     // Create invoice and reduce stock in a transaction
     const invoice = await prisma.$transaction(async (tx) => {

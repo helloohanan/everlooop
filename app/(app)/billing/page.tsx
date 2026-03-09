@@ -15,7 +15,7 @@ export default function BillingPage() {
   const [customerSearch, setCustomerSearch] = useState('')
   const [productSearch, setProductSearch] = useState('')
   const [items, setItems] = useState<LineItem[]>([])
-  const [discount, setDiscount] = useState(0)
+  const [discount, setDiscount] = useState<string>('')
   const [paymentMethod, setPaymentMethod] = useState('Cash')
   const [paymentStatus, setPaymentStatus] = useState('Paid')
   const [notes, setNotes] = useState('')
@@ -72,10 +72,9 @@ export default function BillingPage() {
   }
 
   const subtotal = items.reduce((s, i) => s + i.total, 0)
-  const discountAmount = (subtotal * discount) / 100
+  const discountAmount = parseFloat(discount) || 0
   const afterDiscount = subtotal - discountAmount
-  const vat = afterDiscount * 0.05
-  const total = afterDiscount + vat
+  const total = afterDiscount
 
   const formatQAR = (n: number) => `QAR ${n.toLocaleString('en-QA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
@@ -89,8 +88,8 @@ export default function BillingPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customerId: selectedCustomer.id,
-          items: items.map(i => ({ productId: i.productId, quantity: i.quantity })),
-          discount,
+          items: items.map(i => ({ productId: i.productId, quantity: i.quantity, price: i.price })),
+          discount: parseFloat(discount) || 0,
           paymentMethod,
           paymentStatus,
           notes,
@@ -295,30 +294,34 @@ export default function BillingPage() {
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: 'var(--text-secondary)' }}>Discount (%)</span>
+                <style jsx>{`
+                  input::-webkit-outer-spin-button,
+                  input::-webkit-inner-spin-button {
+                    -webkit-appearance: none;
+                    margin: 0;
+                  }
+                  input[type=number] {
+                    -moz-appearance: textfield;
+                  }
+                `}</style>
+                <span style={{ color: 'var(--text-secondary)' }}>Discount (QAR)</span>
                 <input
                   id="discount-input"
                   type="number"
                   min="0"
-                  max="100"
                   value={discount}
-                  onChange={e => setDiscount(parseFloat(e.target.value) || 0)}
+                  onChange={e => setDiscount(e.target.value)}
                   className="form-input"
                   style={{ width: '80px', padding: '4px 8px', fontSize: '13px', textAlign: 'right' }}
                 />
               </div>
 
-              {discount > 0 && (
+              {discountAmount > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: '#10b981' }}>
                   <span>Discount Amount</span>
                   <span>- {formatQAR(discountAmount)}</span>
                 </div>
               )}
-
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--text-secondary)' }}>VAT (5%)</span>
-                <span>{formatQAR(vat)}</span>
-              </div>
 
               <div className="divider" />
 

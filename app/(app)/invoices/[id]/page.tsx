@@ -229,14 +229,10 @@ function InvoiceDetailContent({ id }: { id: string }) {
             </div>
             {invoice.discount > 0 && (
               <div className="invoice-total-row" style={{ color: '#10b981' }}>
-                <span>Discount ({invoice.discount}%)</span>
-                <span>- {formatQAR(invoice.subtotal * invoice.discount / 100)}</span>
+                <span>Discount</span>
+                <span>- {formatQAR(invoice.discount)}</span>
               </div>
             )}
-            <div className="invoice-total-row">
-              <span>VAT (5%)</span>
-              <span>{formatQAR(invoice.vat)}</span>
-            </div>
             <div className="invoice-total-row grand">
               <span>Grand Total</span>
               <span style={{ color: '#c9973a' }}>{formatQAR(invoice.total)}</span>
