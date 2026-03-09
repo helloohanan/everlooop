@@ -11,14 +11,14 @@
   --brand-accent: #3b82f6;
 
   /* Premium Light Mode */
-  --bg-base: #f8fafc;
-  --bg-card: rgba(255, 255, 255, 0.85);
+  --bg-base: #fafaf9;
+  --bg-card: rgba(250, 250, 249, 0.85);
   /* Slight transparency for glass effect */
-  --bg-sidebar: #f8fafc;
+  --bg-sidebar: #fafaf9;
   --bg-sidebar-hover: rgba(15, 23, 42, 0.05);
   --bg-sidebar-active: rgba(15, 23, 42, 0.08);
 
-  --bg-input: #ffffff;
+  --bg-input: #fafaf9;
   --bg-table-header: rgba(241, 245, 249, 0.9);
   --bg-table-hover: #f1f5f9;
   --bg-overlay: rgba(15, 23, 42, 0.4);
