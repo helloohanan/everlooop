@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { IconDashboard, IconInvoices, IconInventory, IconWarning, IconReports, IconCheck, IconClock, IconCurrency } from '@/components/Icons'
 
@@ -70,7 +70,7 @@ export default function DashboardPage() {
           <div className="stat-icon"><IconCurrency size={28} /></div>
           <div className="stat-info">
             <div className="stat-value">{formatCurrency(data?.todaySales || 0)}</div>
-            <div className="stat-label">Today's Revenue</div>
+            <div className="stat-label">Today's Sales</div>
             <div className="stat-sub" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '10px' }}>
               <span>{data?.todayCount || 0} invoices</span>
               <span style={{ color: '#10b981', fontWeight: 600 }}>+{formatCurrency(data?.todayProfit || 0)} profit</span>
@@ -86,7 +86,7 @@ export default function DashboardPage() {
           <div className="stat-icon"><IconInvoices size={28} /></div>
           <div className="stat-info">
             <div className="stat-value">{formatCurrency(data?.totalRevenue || 0)}</div>
-            <div className="stat-label">Total Revenue</div>
+            <div className="stat-label">Total Sales</div>
             <div className="stat-sub" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '10px' }}>
               <span>All time</span>
               <span style={{ color: '#10b981', fontWeight: 600 }}>{formatCurrency(data?.totalProfit || 0)} profit</span>
@@ -159,10 +159,11 @@ export default function DashboardPage() {
                   <YAxis tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`} />
                   <Tooltip
                     cursor={{ fill: 'var(--bg-secondary)', opacity: 0.4 }}
-                    formatter={(value: number, name: string) => [formatCurrency(value), name === 'revenue' ? 'Revenue' : 'Profit']}
+                    formatter={(value: number, name: string) => [formatCurrency(value), name === 'Sales' ? 'Sales' : 'Profit']}
                     contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '12px', boxShadow: 'var(--shadow-lg)', color: 'var(--text-primary)' }}
                   />
-                  <Bar dataKey="revenue" name="Revenue" fill="#c9973a" radius={[6, 6, 0, 0]} barSize={32} />
+                  <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ paddingBottom: '20px', fontSize: '12px', fontWeight: 600 }} />
+                  <Bar dataKey="revenue" name="Sales" fill="#eab308" radius={[6, 6, 0, 0]} barSize={32} />
                   <Bar dataKey="profit" name="Profit" fill="#10b981" radius={[6, 6, 0, 0]} barSize={32} />
                 </BarChart>
               </ResponsiveContainer>
