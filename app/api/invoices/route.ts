@@ -6,13 +6,18 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status') || ''
+    const date = searchParams.get('date') || ''
     const search = searchParams.get('search') || ''
     const limit = parseInt(searchParams.get('limit') || '50')
+
+    const now = new Date()
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate())
 
     const invoices = await prisma.invoice.findMany({
       where: {
         AND: [
           status ? { paymentStatus: status } : {},
+          date === 'today' ? { date: { gte: startOfDay } } : {},
           search ? {
             OR: [
               { invoiceNumber: { contains: search } },

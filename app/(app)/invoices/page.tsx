@@ -1,5 +1,6 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { IconPlus, IconSearch, IconInvoice, IconCurrency, IconDashboard, IconCheck, IconClock, IconView, IconPrint, IconDelete } from '@/components/Icons'
 
@@ -14,7 +15,9 @@ interface Invoice {
   items: { id: string }[]
 }
 
-export default function InvoicesPage() {
+function InvoicesList() {
+  const searchParams = useSearchParams()
+  const dateParam = searchParams.get('date') || ''
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
@@ -22,12 +25,12 @@ export default function InvoicesPage() {
 
   const load = useCallback(async () => {
     setLoading(true)
-    const params = new URLSearchParams({ search, status: statusFilter })
+    const params = new URLSearchParams({ search, status: statusFilter, date: dateParam })
     const res = await fetch(`/api/invoices?${params}`)
     const data = await res.json()
     setInvoices(Array.isArray(data) ? data : [])
     setLoading(false)
-  }, [search, statusFilter])
+  }, [search, statusFilter, dateParam])
 
   const handleDelete = async (id: string, num: string) => {
     if (!confirm(`Are you sure you want to delete invoice ${num}?`)) return
@@ -51,8 +54,8 @@ export default function InvoicesPage() {
     <div className="page-content">
       <div className="section-header">
         <div>
-          <h1 className="section-title">Invoices</h1>
-          <p className="section-subtitle">{invoices.length} invoices found</p>
+          <h1 className="section-title">{dateParam === 'today' ? "Today's Invoices" : "Invoices"}</h1>
+          <p className="section-subtitle">{invoices.length} {dateParam === 'today' ? "invoices today" : "invoices found"}</p>
         </div>
         <a href="/billing" className="btn btn-primary" id="new-invoice-btn"><IconPlus style={{ marginRight: '8px' }} /> New Invoice</a>
       </div>
@@ -68,19 +71,25 @@ export default function InvoicesPage() {
             onChange={e => setSearch(e.target.value)}
           />
         </div>
-        <select
-          id="status-filter"
-          className="form-select"
-          style={{ width: 'auto' }}
-          value={statusFilter}
-          onChange={e => setStatusFilter(e.target.value)}
-        >
-          <option value="">All Statuses</option>
-          <option value="Paid">Paid</option>
-          <option value="Pending">Pending</option>
-        </select>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          {dateParam === 'today' && (
+            <a href="/invoices" className="btn btn-sm btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              Clear Filter
+            </a>
+          )}
+          <select
+            id="status-filter"
+            className="form-select"
+            style={{ width: 'auto' }}
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+          >
+            <option value="">All Statuses</option>
+            <option value="Paid">Paid</option>
+            <option value="Pending">Pending</option>
+          </select>
+        </div>
       </div>
-
       <div className="card">
         <div className="table-wrapper">
           {loading ? (
@@ -150,5 +159,13 @@ export default function InvoicesPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function InvoicesPage() {
+  return (
+    <Suspense fallback={<div className="page-content"><div className="spinner" style={{ margin: '40px auto' }} /></div>}>
+      <InvoicesList />
+    </Suspense>
   )
 }

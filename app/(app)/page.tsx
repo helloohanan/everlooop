@@ -1,22 +1,30 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { IconDashboard, IconInvoices, IconInventory, IconWarning, IconReports, IconCheck, IconClock, IconCurrency } from '@/components/Icons'
 
 interface DashboardData {
   todaySales: number
+  todayProfit: number
   todayCount: number
   totalInvoices: number
+  totalRevenue: number
+  totalProfit: number
   totalProducts: number
   lowStockProducts: { id: string; name: string; stock: number; productId: string }[]
-  monthly: { month: string; revenue: number; count: number }[]
+  daily: { label: string; revenue: number; profit: number; count: number }[]
+  monthly: { label: string; revenue: number; profit: number; count: number }[]
+  yearly: { label: string; revenue: number; profit: number; count: number }[]
   recentInvoices: { id: string; invoiceNumber: string; total: number; paymentStatus: string; date: string; customer: { name: string } }[]
 }
 
 export default function DashboardPage() {
+  const router = useRouter()
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [viewType, setViewType] = useState<'daily' | 'monthly' | 'yearly'>('monthly')
 
   useEffect(() => {
     fetch('/api/dashboard')
@@ -38,6 +46,9 @@ export default function DashboardPage() {
     )
   }
 
+  const chartData = data ? (viewType === 'daily' ? data.daily : viewType === 'monthly' ? data.monthly : data.yearly) : []
+  const chartLabel = viewType === 'daily' ? 'Daily Performance' : viewType === 'monthly' ? 'Monthly Performance' : 'Yearly Performance'
+
   return (
     <div className="page-content">
       <div className="section-header">
@@ -51,25 +62,43 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       <div className="stats-grid">
-        <div className="stat-card" style={{ '--stat-color': '#c9973a', '--stat-bg': 'rgba(201,151,58,0.12)' } as React.CSSProperties}>
+        <div
+          className="stat-card"
+          style={{ '--stat-color': '#c9973a', '--stat-bg': 'rgba(201,151,58,0.12)', cursor: 'pointer' } as React.CSSProperties}
+          onClick={() => router.push('/invoices?date=today')}
+        >
           <div className="stat-icon"><IconCurrency size={28} /></div>
           <div className="stat-info">
             <div className="stat-value">{formatCurrency(data?.todaySales || 0)}</div>
             <div className="stat-label">Today's Revenue</div>
-            <div className="stat-sub">{data?.todayCount || 0} invoices today</div>
+            <div className="stat-sub" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '10px' }}>
+              <span>{data?.todayCount || 0} invoices</span>
+              <span style={{ color: '#10b981', fontWeight: 600 }}>+{formatCurrency(data?.todayProfit || 0)} profit</span>
+            </div>
           </div>
         </div>
 
-        <div className="stat-card" style={{ '--stat-color': '#3b82f6', '--stat-bg': 'rgba(59,130,246,0.1)' } as React.CSSProperties}>
+        <div
+          className="stat-card"
+          style={{ '--stat-color': '#3b82f6', '--stat-bg': 'rgba(59,130,246,0.1)', cursor: 'pointer' } as React.CSSProperties}
+          onClick={() => router.push('/invoices')}
+        >
           <div className="stat-icon"><IconInvoices size={28} /></div>
           <div className="stat-info">
-            <div className="stat-value">{data?.totalInvoices || 0}</div>
-            <div className="stat-label">Total Invoices</div>
-            <div className="stat-sub">All time</div>
+            <div className="stat-value">{formatCurrency(data?.totalRevenue || 0)}</div>
+            <div className="stat-label">Total Revenue</div>
+            <div className="stat-sub" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: '10px' }}>
+              <span>All time</span>
+              <span style={{ color: '#10b981', fontWeight: 600 }}>{formatCurrency(data?.totalProfit || 0)} profit</span>
+            </div>
           </div>
         </div>
 
-        <div className="stat-card" style={{ '--stat-color': '#10b981', '--stat-bg': 'rgba(16,185,129,0.1)' } as React.CSSProperties}>
+        <div
+          className="stat-card"
+          style={{ '--stat-color': '#10b981', '--stat-bg': 'rgba(16,185,129,0.1)', cursor: 'pointer' } as React.CSSProperties}
+          onClick={() => router.push('/products')}
+        >
           <div className="stat-icon"><IconInventory size={28} /></div>
           <div className="stat-info">
             <div className="stat-value">{data?.totalProducts || 0}</div>
@@ -93,24 +122,48 @@ export default function DashboardPage() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginBottom: '20px' }}>
-        {/* Monthly Sales Chart */}
+        {/* Sales Chart */}
         <div className="card">
-          <div className="card-header">
-            <h2 className="card-title"><IconReports /> Monthly Revenue</h2>
-            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Last 6 months</span>
+          <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h2 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <IconReports /> {chartLabel}
+            </h2>
+            <div style={{ display: 'flex', background: 'var(--bg-secondary)', padding: '4px', borderRadius: '8px', gap: '4px' }}>
+              {(['daily', 'monthly', 'yearly'] as const).map(type => (
+                <button
+                  key={type}
+                  onClick={() => setViewType(type)}
+                  style={{
+                    padding: '4px 12px',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    background: viewType === type ? 'var(--brand-primary)' : 'transparent',
+                    color: viewType === type ? 'white' : 'var(--text-secondary)',
+                    fontWeight: 600,
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="card-body">
             <div className="chart-container">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data?.monthly || []}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
-                  <XAxis dataKey="month" tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} />
-                  <YAxis tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`} />
+                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />
+                  <XAxis dataKey="label" tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`} />
                   <Tooltip
-                    formatter={(value: number) => [formatCurrency(value), 'Revenue']}
-                    contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-primary)' }}
+                    cursor={{ fill: 'var(--bg-secondary)', opacity: 0.4 }}
+                    formatter={(value: number, name: string) => [formatCurrency(value), name === 'revenue' ? 'Revenue' : 'Profit']}
+                    contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '12px', boxShadow: 'var(--shadow-lg)', color: 'var(--text-primary)' }}
                   />
-                  <Bar dataKey="revenue" fill="#c9973a" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="revenue" name="Revenue" fill="#c9973a" radius={[6, 6, 0, 0]} barSize={32} />
+                  <Bar dataKey="profit" name="Profit" fill="#10b981" radius={[6, 6, 0, 0]} barSize={32} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
