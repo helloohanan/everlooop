@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { generateInvoiceNumber } from '@/lib/utils'
+import { revalidatePath } from 'next/cache'
+
 
 export async function GET(request: NextRequest) {
   try {
@@ -114,7 +116,12 @@ export async function POST(request: NextRequest) {
       return inv
     })
 
+    // Revalidate dashboard data
+    revalidatePath('/')
+    revalidatePath('/api/dashboard')
+
     return NextResponse.json(invoice, { status: 201 })
+
   } catch (err) {
     console.error('POST invoice error:', err)
     return NextResponse.json({ error: 'Server error' }, { status: 500 })

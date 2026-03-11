@@ -5,7 +5,7 @@ import { IconWarning, IconCustomers, IconPhone, IconEmail, IconLocation, IconSea
 
 interface Customer { id: string; name: string; phone?: string; email?: string; address?: string }
 interface Product { id: string; productId: string; name: string; type: string; size: string; material: string; price: number; stock: number }
-interface LineItem { productId: string; product: Product; quantity: number; price: number; size: string; total: number }
+interface LineItem { productId: string; product: Product; quantity: number; price: number; size: string; total: number; unitPriceStr?: string }
 
 export default function BillingPage() {
   const router = useRouter()
@@ -55,11 +55,27 @@ export default function BillingPage() {
 
   const parseSize = (s: string) => {
     const match = s.match(/^(\d+(?:\.\d+)?)\s*[x*]\s*(\d+(?:\.\d+)?)$/i)
-    if (match) return { w: parseFloat(match[1]), l: parseFloat(match[2]) }
+    if (match) {
+      const w = parseFloat(match[1])
+      const l = parseFloat(match[2])
+      return { w, l, area: w * l }
+    }
     return null
   }
 
+  const getUnitPrice = (item: LineItem) => {
+    if (item.unitPriceStr !== undefined) return item.unitPriceStr
+    const s = parseSize(item.size)
+    if (s && s.area > 0) {
+      const val = item.price / s.area
+      return val > 0 ? Number(val.toFixed(4)).toString() : ''
+    }
+    return ''
+  }
+
   const updateSize = (productId: string, newSize: string) => {
+    setManualTotal('')
+    setDiscount('')
     setItems(items.map(item => {
       if (item.productId !== productId) return item
 
@@ -73,11 +89,13 @@ export default function BillingPage() {
         newPrice = (newArea / origArea) * item.product.price
       }
 
-      return { ...item, size: newSize, price: newPrice, total: newPrice * item.quantity }
+      return { ...item, size: newSize, price: newPrice, total: newPrice * item.quantity, unitPriceStr: undefined }
     }))
   }
 
   const updateQty = (productId: string, qty: number) => {
+    setManualTotal('')
+    setDiscount('')
     if (qty <= 0) {
       setItems(items.filter(i => i.productId !== productId))
     } else {
@@ -89,16 +107,36 @@ export default function BillingPage() {
   }
 
   const updatePrice = (productId: string, price: number) => {
+    setManualTotal('')
+    setDiscount('')
     setItems(items.map(i => i.productId === productId
-      ? { ...i, price, total: price * i.quantity }
+      ? { ...i, price, total: price * i.quantity, unitPriceStr: undefined }
       : i
     ))
   }
 
+  const updateUnitPrice = (productId: string, unitPriceStr: string) => {
+    setManualTotal('')
+    setDiscount('')
+    setItems(items.map(i => {
+      if (i.productId !== productId) return i
+      if (unitPriceStr === '') return { ...i, unitPriceStr: '' }
+
+      const unitPrice = parseFloat(unitPriceStr) || 0
+      const s = parseSize(i.size)
+      const newPrice = s ? unitPrice * s.area : i.price
+      return { ...i, price: newPrice, total: newPrice * i.quantity, unitPriceStr: undefined }
+    }))
+  }
+
   const subtotal = items.reduce((s, i) => s + i.total, 0)
-  const discountAmount = parseFloat(discount) || 0
-  const afterDiscount = subtotal - discountAmount
-  const total = afterDiscount
+  const [manualTotal, setManualTotal] = useState<string>('')
+
+  const discountAmount = manualTotal
+    ? Math.max(0, subtotal - (parseFloat(manualTotal) || 0))
+    : (parseFloat(discount) || 0)
+
+  const total = manualTotal ? (parseFloat(manualTotal) || 0) : (subtotal - discountAmount)
 
   const formatQAR = (n: number) => `QAR ${n.toLocaleString('en-QA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
@@ -121,7 +159,9 @@ export default function BillingPage() {
       })
       const data = await res.json()
       if (res.ok) {
+        router.refresh()
         router.push(`/invoices/${data.id}`)
+
       } else {
         setError(data.error || 'Failed to create invoice')
       }
@@ -252,6 +292,7 @@ export default function BillingPage() {
                       <tr>
                         <th>Product</th>
                         <th style={{ width: '100px' }}>Size</th>
+                        <th style={{ width: '90px' }}>Unit Price</th>
                         <th style={{ width: '90px' }}>Price (QAR)</th>
                         <th style={{ width: '80px' }}>Qty</th>
                         <th style={{ width: '120px' }}>Total</th>
@@ -280,9 +321,22 @@ export default function BillingPage() {
                               type="number"
                               min="0"
                               step="0.01"
-                              value={item.price}
+                              value={getUnitPrice(item)}
+                              onChange={e => updateUnitPrice(item.productId, e.target.value)}
+                              className="form-input no-spin"
+                              placeholder=""
+                              style={{ width: '90px', padding: '4px 8px', fontSize: '13px' }}
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={item.price || ''}
                               onChange={e => updatePrice(item.productId, parseFloat(e.target.value) || 0)}
-                              className="form-input"
+                              className="form-input no-spin"
+                              placeholder="0.00"
                               style={{ width: '90px', padding: '4px 8px', fontSize: '13px' }}
                             />
                           </td>
@@ -330,14 +384,7 @@ export default function BillingPage() {
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <style jsx>{`
-                  input::-webkit-outer-spin-button,
-                  input::-webkit-inner-spin-button {
-                    -webkit-appearance: none;
-                    margin: 0;
-                  }
-                  input[type=number] {
-                    -moz-appearance: textfield;
-                  }
+                  /* Local override if needed, but we have .no-spin global now */
                 `}</style>
                 <span style={{ color: 'var(--text-secondary)' }}>Discount (QAR)</span>
                 <input
@@ -345,13 +392,17 @@ export default function BillingPage() {
                   type="number"
                   min="0"
                   value={discount}
-                  onChange={e => setDiscount(e.target.value)}
+                  onChange={e => {
+                    setDiscount(e.target.value)
+                    const d = parseFloat(e.target.value) || 0
+                    setManualTotal((subtotal - d).toString())
+                  }}
                   className="form-input"
                   style={{ width: '80px', padding: '4px 8px', fontSize: '13px', textAlign: 'right' }}
                 />
               </div>
 
-              {discountAmount > 0 && (
+              {discountAmount > 0.01 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: '#10b981' }}>
                   <span>Discount Amount</span>
                   <span>- {formatQAR(discountAmount)}</span>
@@ -360,9 +411,21 @@ export default function BillingPage() {
 
               <div className="divider" />
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '18px', fontWeight: 800, color: 'var(--brand-primary)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '18px', fontWeight: 800, color: 'var(--brand-primary)', alignItems: 'center' }}>
                 <span>Grand Total</span>
-                <span>{formatQAR(total)}</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={manualTotal === '' && total > 0 ? total.toFixed(2) : manualTotal}
+                  onChange={e => {
+                    setManualTotal(e.target.value)
+                    const val = e.target.value === '' ? subtotal : (parseFloat(e.target.value) || 0)
+                    setDiscount((subtotal - val).toFixed(2))
+                  }}
+                  className="form-input no-spin"
+                  placeholder="0.00"
+                  style={{ width: '130px', padding: '4px 8px', fontSize: '18px', fontWeight: 800, textAlign: 'right', color: 'var(--brand-primary)', border: '1px dashed var(--brand-primary)', background: 'transparent' }}
+                />
               </div>
             </div>
           </div>
