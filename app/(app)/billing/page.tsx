@@ -238,10 +238,10 @@ export default function BillingPage() {
 
           {/* Products */}
           <div className="card">
-            <div className="card-header">
-              <h2 className="card-title"><IconInventory /> Carpet Items</h2>
+            <div className="card-header" style={{ padding: '16px 24px' }}>
+              <h2 className="card-title" style={{ fontSize: '16px' }}><IconInventory /> Carpet Items</h2>
             </div>
-            <div className="card-body">
+            <div className="card-body" style={{ padding: '16px 24px' }}>
               {/* Product search */}
               <div style={{ position: 'relative', marginBottom: '16px' }}>
                 <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}><IconSearch /></div>
@@ -280,43 +280,43 @@ export default function BillingPage() {
 
               {/* Items table */}
               {items.length === 0 ? (
-                <div className="empty-state" style={{ padding: '30px' }}>
-                  <div className="empty-state-icon"><IconInventory size={48} /></div>
-                  <div className="empty-state-title">No items added</div>
-                  <div className="empty-state-desc">Search and select carpet products above</div>
+                <div className="empty-state" style={{ padding: '20px' }}>
+                  <div className="empty-state-icon" style={{ marginBottom: '10px' }}><IconInventory size={32} /></div>
+                  <div className="empty-state-title" style={{ fontSize: '14px' }}>No items added</div>
+                  <div className="empty-state-desc" style={{ fontSize: '12px' }}>Search and select carpet products above</div>
                 </div>
               ) : (
-                <div className="table-wrapper">
-                  <table>
+                <div className="table-wrapper" style={{ borderRadius: '8px' }}>
+                  <table style={{ fontSize: '12px' }}>
                     <thead>
                       <tr>
-                        <th>Product</th>
-                        <th style={{ width: '100px' }}>Size</th>
-                        <th style={{ width: '90px' }}>Unit Price</th>
-                        <th style={{ width: '90px' }}>Price (QAR)</th>
-                        <th style={{ width: '80px' }}>Qty</th>
-                        <th style={{ width: '120px' }}>Total</th>
-                        <th style={{ width: '40px' }}></th>
+                        <th style={{ padding: '10px 12px' }}>Product</th>
+                        <th style={{ width: '90px', padding: '10px 12px' }}>Size</th>
+                        <th style={{ width: '85px', padding: '10px 12px' }}>Unit Price</th>
+                        <th style={{ width: '85px', padding: '10px 12px' }}>Price (QAR)</th>
+                        <th style={{ width: '60px', padding: '10px 12px' }}>Qty</th>
+                        <th style={{ width: '100px', padding: '10px 12px' }}>Total</th>
+                        <th style={{ width: '36px', padding: '10px 12px' }}></th>
                       </tr>
                     </thead>
                     <tbody>
                       {items.map(item => (
                         <tr key={item.productId}>
-                          <td>
-                            <div style={{ fontWeight: 600, fontSize: '13px' }}>{item.product.name}</div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{item.product.productId} · {item.product.type}</div>
+                          <td style={{ padding: '8px 12px' }}>
+                            <div style={{ fontWeight: 600, fontSize: '12px' }}>{item.product.name}</div>
+                            <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{item.product.productId} · {item.product.type}</div>
                           </td>
-                          <td>
+                          <td style={{ padding: '8px 12px' }}>
                             <input
                               type="text"
                               value={item.size}
                               onChange={e => updateSize(item.productId, e.target.value)}
                               className="form-input"
                               placeholder="e.g. 5x7"
-                              style={{ width: '100px', padding: '4px 8px', fontSize: '13px' }}
+                              style={{ width: '80px', padding: '4px 6px', fontSize: '12px', height: '30px' }}
                             />
                           </td>
-                          <td>
+                          <td style={{ padding: '8px 12px' }}>
                             <input
                               type="number"
                               min="0"
@@ -325,10 +325,10 @@ export default function BillingPage() {
                               onChange={e => updateUnitPrice(item.productId, e.target.value)}
                               className="form-input no-spin"
                               placeholder=""
-                              style={{ width: '90px', padding: '4px 8px', fontSize: '13px' }}
+                              style={{ width: '75px', padding: '4px 6px', fontSize: '12px', height: '30px' }}
                             />
                           </td>
-                          <td>
+                          <td style={{ padding: '8px 12px' }}>
                             <input
                               type="number"
                               min="0"
@@ -337,10 +337,10 @@ export default function BillingPage() {
                               onChange={e => updatePrice(item.productId, parseFloat(e.target.value) || 0)}
                               className="form-input no-spin"
                               placeholder="0.00"
-                              style={{ width: '90px', padding: '4px 8px', fontSize: '13px' }}
+                              style={{ width: '75px', padding: '4px 6px', fontSize: '12px', height: '30px' }}
                             />
                           </td>
-                          <td>
+                          <td style={{ padding: '8px 12px' }}>
                             <input
                               type="number"
                               min="1"
@@ -348,15 +348,16 @@ export default function BillingPage() {
                               value={item.quantity}
                               onChange={e => updateQty(item.productId, parseInt(e.target.value) || 0)}
                               className="form-input"
-                              style={{ width: '60px', padding: '4px 8px', fontSize: '13px' }}
+                              style={{ width: '50px', padding: '4px 6px', fontSize: '12px', height: '30px' }}
                             />
                           </td>
-                          <td style={{ fontWeight: 700 }}>QAR {item.total.toLocaleString('en-QA', { minimumFractionDigits: 2 })}</td>
-                          <td>
+                          <td style={{ padding: '8px 12px', fontWeight: 700 }}>QAR {item.total.toLocaleString('en-QA', { minimumFractionDigits: 2 })}</td>
+                          <td style={{ padding: '8px 12px' }}>
                             <button
                               className="btn btn-sm btn-danger btn-icon"
+                              style={{ width: '28px', height: '28px', minWidth: '28px', borderRadius: '6px' }}
                               onClick={() => setItems(items.filter(i => i.productId !== item.productId))}
-                            ><IconX /></button>
+                            ><IconX size={14} /></button>
                           </td>
                         </tr>
                       ))}
