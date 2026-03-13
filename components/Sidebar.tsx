@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useTheme } from '@/components/ThemeProvider'
 import { useState } from 'react'
-import { IconDashboard, IconInvoice, IconInvoices, IconCustomers, IconInventory, IconReports, IconSun, IconMoon, IconLogout } from '@/components/Icons'
+import { IconDashboard, IconInvoice, IconInvoices, IconCustomers, IconInventory, IconReports, IconSun, IconMoon, IconLogout, IconLock } from '@/components/Icons'
 
 interface NavItem {
   href: string
@@ -74,6 +74,16 @@ export default function Sidebar({ user, lowStockCount = 0 }: SidebarProps) {
             </Link>
           )
         })}
+        <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid var(--border-color)', opacity: 0.6, fontSize: '11px', fontWeight: 600, paddingLeft: '12px', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          User Controls
+        </div>
+        <Link
+          href="/settings"
+          className={`nav-item ${pathname === '/settings' ? 'active' : ''}`}
+        >
+          <span className="nav-item-icon"><IconLock /></span>
+          <span>{user?.role === 'ADMIN' ? 'Admin' : 'Staff'}</span>
+        </Link>
       </nav>
 
       <div className="sidebar-footer">

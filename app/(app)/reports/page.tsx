@@ -6,7 +6,6 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 interface ReportData {
   period: string
   totalRevenue: number
-  totalVAT: number
   totalInvoices: number
   paidInvoices: number
   pendingInvoices: number
@@ -80,14 +79,6 @@ export default function ReportsPage() {
                 <div className="stat-value">{data.totalInvoices}</div>
                 <div className="stat-label">Total Invoices</div>
                 <div className="stat-sub">{data.paidInvoices} paid · {data.pendingInvoices} pending</div>
-              </div>
-            </div>
-            <div className="stat-card" style={{ '--stat-color': '#10b981', '--stat-bg': 'rgba(16,185,129,0.1)' } as React.CSSProperties}>
-              <div className="stat-icon"><IconInvoice /></div>
-              <div className="stat-info">
-                <div className="stat-value" style={{ fontSize: '18px' }}>{formatQAR(data.totalVAT)}</div>
-                <div className="stat-label">VAT Collected (5%)</div>
-                <div className="stat-sub">{periodLabel}</div>
               </div>
             </div>
             <div className="stat-card" style={{ '--stat-color': '#f59e0b', '--stat-bg': 'rgba(245,158,11,0.1)' } as React.CSSProperties}>

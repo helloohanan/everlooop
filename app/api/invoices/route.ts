@@ -53,18 +53,24 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate products and calculate totals
+    const productIds = items.map((i: any) => i.productId)
+    const products = await prisma.product.findMany({
+      where: { id: { in: productIds } }
+    })
+
+    const productMap = new Map(products.map(p => [p.id, p]))
     let subtotal = 0
     const validatedItems: { productId: string; quantity: number; price: number; size?: string; total: number }[] = []
 
     for (const item of items) {
-      const product = await prisma.product.findUnique({ where: { id: item.productId } })
+      const product = productMap.get(item.productId)
       if (!product) {
         return NextResponse.json({ error: `Product not found: ${item.productId}` }, { status: 400 })
       }
       if (product.stock < item.quantity) {
         return NextResponse.json({ error: `Insufficient stock for ${product.name}. Available: ${product.stock}` }, { status: 400 })
       }
-      // Use provided price or fall back to product price
+
       const itemPrice = typeof item.price === 'number' ? item.price : product.price
       const total = itemPrice * item.quantity
       subtotal += total
@@ -78,19 +84,18 @@ export async function POST(request: NextRequest) {
     }
 
     const discountAmount = discount || 0
-    const afterDiscount = subtotal - discountAmount
-    const vat = 0
-    const total = afterDiscount
+    const total = subtotal - discountAmount
 
     // Create invoice and reduce stock in a transaction
     const invoice = await prisma.$transaction(async (tx) => {
+      // 1. Create Invoice
       const inv = await tx.invoice.create({
         data: {
           invoiceNumber: generateInvoiceNumber(),
           customerId,
           subtotal,
-          discount: discount || 0,
-          vat,
+          discount: discountAmount,
+          vat: 0,
           total,
           paymentMethod: paymentMethod || 'Cash',
           paymentStatus: paymentStatus || 'Paid',
@@ -105,15 +110,18 @@ export async function POST(request: NextRequest) {
         },
       })
 
-      // Reduce stock for each item
-      for (const item of validatedItems) {
-        await tx.product.update({
+      // 2. Bulk Update Stock (Still sequential but inside transaction is safer)
+      // For PostgreSQL, we could do a single query but Prisma's update is fine if we're careful.
+      await Promise.all(validatedItems.map(item =>
+        tx.product.update({
           where: { id: item.productId },
           data: { stock: { decrement: item.quantity } },
         })
-      }
+      ))
 
       return inv
+    }, {
+      timeout: 10000 // Increase timeout to 10s for large invoices
     })
 
     // Revalidate dashboard data

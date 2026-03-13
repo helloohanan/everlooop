@@ -29,7 +29,6 @@ export async function GET(request: NextRequest) {
     })
 
     const totalRevenue = invoices.reduce((s, i) => s + i.total, 0)
-    const totalVAT = invoices.reduce((s, i) => s + i.vat, 0)
     const totalInvoices = invoices.length
     const paidInvoices = invoices.filter(i => i.paymentStatus === 'Paid').length
     const pendingInvoices = invoices.filter(i => i.paymentStatus === 'Pending').length
@@ -60,7 +59,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       period,
       totalRevenue,
-      totalVAT,
       totalInvoices,
       paidInvoices,
       pendingInvoices,

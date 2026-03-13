@@ -122,6 +122,7 @@ body {
 
 .no-spin[type=number] {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 /* Custom Webkit Scrollbar */
@@ -1149,7 +1150,7 @@ tbody tr:last-child td {
 .invoice-preview {
   background: #ffffff;
   color: #0f172a;
-  padding: 64px;
+  padding: 32px;
   border-radius: var(--border-radius-lg);
   max-width: 850px;
   margin: 0 auto;
@@ -1166,14 +1167,14 @@ tbody tr:last-child td {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 48px;
-  padding-bottom: 32px;
-  border-bottom: 4px solid var(--brand-primary);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--brand-primary);
 }
 
 .invoice-logo {
   font-family: 'Outfit', sans-serif;
-  font-size: 36px;
+  font-size: 28px;
   font-weight: 800;
   color: var(--brand-primary-dark);
 }
@@ -1192,21 +1193,21 @@ tbody tr:last-child td {
 
 .invoice-num {
   font-family: 'Outfit', sans-serif;
-  font-size: 28px;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 700;
   color: #0f172a;
 }
 
 .invoice-table {
   width: 100%;
-  margin: 32px 0;
+  margin: 16px 0;
   border-collapse: collapse;
 }
 
 .invoice-table th {
   background: #0f172a;
   color: white;
-  padding: 14px 20px;
+  padding: 8px 16px;
   text-align: left;
   font-size: 13px;
   font-weight: 700;
@@ -1215,9 +1216,9 @@ tbody tr:last-child td {
 }
 
 .invoice-table td {
-  padding: 16px 20px;
+  padding: 10px 16px;
   border-bottom: 1px solid #e2e8f0;
-  font-size: 14px;
+  font-size: 13px;
   color: #0f172a;
 }
 
@@ -1233,17 +1234,22 @@ tbody tr:last-child td {
 .invoice-total-row {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
+  padding: 10px 0;
   color: #475569;
-  font-size: 15px;
+  font-size: 14px;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.invoice-total-row:last-child {
+  border-bottom: none;
 }
 
 .invoice-total-row.grand {
-  font-size: 20px;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 700;
   color: #0f172a;
-  border-top: 2px solid var(--brand-primary);
-  padding-top: 16px;
+  border-top: 1px solid var(--brand-primary);
+  padding-top: 12px;
   margin-top: 8px;
 }
 
@@ -1469,6 +1475,22 @@ tbody tr:last-child td {
 
 .mb-16 {
   margin-bottom: 16px;
+}
+
+.billing-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.billing-total-box {
+  background: var(--bg-table-header);
+  padding: 16px;
+  border-radius: var(--border-radius-sm);
+  margin-top: 12px;
+  border: 1px solid var(--border-color);
 }
 
 .mb-24 {

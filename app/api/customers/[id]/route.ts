@@ -3,10 +3,10 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params
+    const { id } = params
     const customer = await prisma.customer.findUnique({
       where: { id },
       include: {
@@ -16,7 +16,7 @@ export async function GET(
         },
       },
     })
-    
+
     if (!customer) return NextResponse.json({ error: 'Not found' }, { status: 404 })
     return NextResponse.json(customer)
   } catch (err) {
@@ -26,18 +26,18 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params
+    const { id } = params
     const body = await request.json()
     const { name, phone, email, address } = body
-    
+
     const customer = await prisma.customer.update({
       where: { id },
       data: { name, phone, email, address },
     })
-    
+
     return NextResponse.json(customer)
   } catch (err) {
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
@@ -46,10 +46,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params
+    const { id } = params
     await prisma.customer.delete({ where: { id } })
     return NextResponse.json({ success: true })
   } catch (err) {

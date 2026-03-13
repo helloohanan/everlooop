@@ -6,10 +6,12 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search') || ''
     const type = searchParams.get('type') || ''
+    const deletedOnly = searchParams.get('deleted') === 'true'
 
     const products = await prisma.product.findMany({
       where: {
         AND: [
+          { deletedAt: deletedOnly ? { not: null } : null },
           search ? {
             OR: [
               { name: { contains: search } },
@@ -20,7 +22,7 @@ export async function GET(request: NextRequest) {
           type ? { type } : {},
         ]
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { [deletedOnly ? 'deletedAt' : 'createdAt']: 'desc' },
     })
 
     return NextResponse.json(products)

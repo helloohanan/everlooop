@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { Suspense } from 'react'
 import Image from 'next/image'
 import { IconCheck, IconPrint, IconDownload, IconDelete, IconClock, IconPhone, IconEmail, IconLocation } from '@/components/Icons'
+import { numberToWords, formatDate, formatTime } from '@/lib/utils'
 
 interface Invoice {
   id: string
@@ -29,9 +30,6 @@ function formatQAR(n: number) {
   return `QAR ${n.toLocaleString('en-QA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
-function formatDateStr(d: string) {
-  return new Date(d).toLocaleDateString('en-QA', { year: 'numeric', month: 'long', day: 'numeric' })
-}
 
 function InvoiceDetailContent({ id }: { id: string }) {
   const [invoice, setInvoice] = useState<Invoice | null>(null)
@@ -151,10 +149,11 @@ function InvoiceDetailContent({ id }: { id: string }) {
             </div>
           </div>
           <div className="invoice-meta">
-            <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '6px' }}>Invoice</div>
-            <div className="invoice-num">{invoice.invoiceNumber}</div>
+            <div style={{ fontSize: '10px', color: '#9ca3af', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Invoice Number</div>
+            <div className="invoice-num" style={{ fontSize: '16px', fontWeight: 600 }}>#{invoice.invoiceNumber}</div>
             <div style={{ marginTop: '8px', fontSize: '12px', color: '#6b7280' }}>
-              <div><strong>Date:</strong> {formatDateStr(invoice.date)}</div>
+              <div><strong>Date:</strong> {formatDate(invoice.date)}</div>
+              <div><strong>Time:</strong> {formatTime(invoice.date)}</div>
               <div style={{ marginTop: '4px' }}>
                 <span style={{
                   display: 'inline-block',
@@ -173,7 +172,7 @@ function InvoiceDetailContent({ id }: { id: string }) {
         </div>
 
         {/* Customer Info */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '28px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '16px' }}>
           <div>
             <div style={{ fontSize: '10px', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Bill To</div>
             <div style={{ fontWeight: 700, fontSize: '15px', color: '#1a2744' }}>{invoice.customer.name}</div>
@@ -220,22 +219,18 @@ function InvoiceDetailContent({ id }: { id: string }) {
           </tbody>
         </table>
 
+        {/* Line divider after products */}
+        <div style={{ margin: '12px 0', height: '1px', background: '#e5e7eb' }}></div>
+
         {/* Totals */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <div className="invoice-totals">
-            <div className="invoice-total-row">
-              <span>Subtotal</span>
-              <span>{formatQAR(invoice.subtotal)}</span>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+          <div className="invoice-totals" style={{ padding: '0', background: 'transparent', border: 'none', width: 'auto', textAlign: 'right' }}>
+            <div className="invoice-total-row grand" style={{ borderBottom: 'none' }}>
+              <span style={{ marginRight: '40px' }}>Grand Total</span>
+              <span style={{ color: 'var(--brand-primary)' }}>{formatQAR(invoice.total)}</span>
             </div>
-            {invoice.discount > 0 && (
-              <div className="invoice-total-row" style={{ color: '#10b981' }}>
-                <span>Discount</span>
-                <span>- {formatQAR(invoice.discount)}</span>
-              </div>
-            )}
-            <div className="invoice-total-row grand">
-              <span>Grand Total</span>
-              <span style={{ color: '#c9973a' }}>{formatQAR(invoice.total)}</span>
+            <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '-4px' }}>
+              {numberToWords(invoice.total)} Only
             </div>
           </div>
         </div>
@@ -254,17 +249,30 @@ function InvoiceDetailContent({ id }: { id: string }) {
 
       <style>{`
         @media print {
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
           .no-print { display: none !important; }
           .sidebar, .main-content > *:not(.page-content) { display: none !important; }
-          body { background: white; }
-          .main-content { margin-left: 0; }
+          body { background: white !important; }
+          .main-content { margin-left: 0 !important; }
           .invoice-preview { 
-            box-shadow: none; 
-            max-width: 100%; 
-            border-radius: 0; 
-            padding: 20px;
+            box-shadow: none !important; 
+            max-width: 100% !important; 
+            border-radius: 0 !important; 
+            padding: 0 !important;
+            margin: 0 !important;
+            background: white !important;
           }
-          .page-content { padding: 0; }
+          .invoice-header { margin-bottom: 12px; padding-bottom: 8px; }
+          .invoice-table { margin: 10px 0; }
+          .invoice-table th { padding: 6px 12px; font-size: 11px; }
+          .invoice-table td { padding: 6px 12px; font-size: 11px; }
+          .invoice-num { font-size: 14px; }
+          .invoice-logo { font-size: 22px; }
+          .page-content { padding: 0 !important; }
+          @page { margin: 1cm; }
         }
       `}</style>
     </div>

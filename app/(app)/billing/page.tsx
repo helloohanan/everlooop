@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { IconWarning, IconCustomers, IconPhone, IconEmail, IconLocation, IconSearch, IconInventory, IconDashboard, IconInvoice, IconCurrency, IconCheck, IconClock, IconX } from '@/components/Icons'
+import { IconWarning, IconCustomers, IconPhone, IconEmail, IconLocation, IconSearch, IconInventory, IconDashboard, IconInvoice, IconCurrency, IconCheck, IconClock, IconX, IconCash, IconCreditCard, IconBankTransfer } from '@/components/Icons'
 
 interface Customer { id: string; name: string; phone?: string; email?: string; address?: string }
 interface Product { id: string; productId: string; name: string; type: string; size: string; material: string; price: number; stock: number }
@@ -384,9 +384,6 @@ export default function BillingPage() {
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <style jsx>{`
-                  /* Local override if needed, but we have .no-spin global now */
-                `}</style>
                 <span style={{ color: 'var(--text-secondary)' }}>Discount (QAR)</span>
                 <input
                   id="discount-input"
@@ -398,7 +395,7 @@ export default function BillingPage() {
                     const d = parseFloat(e.target.value) || 0
                     setManualTotal((subtotal - d).toString())
                   }}
-                  className="form-input"
+                  className="form-input no-spin"
                   style={{ width: '80px', padding: '4px 8px', fontSize: '13px', textAlign: 'right' }}
                 />
               </div>
@@ -439,18 +436,55 @@ export default function BillingPage() {
             <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div className="form-group">
                 <label className="form-label">Payment Method</label>
-                <select id="payment-method" className="form-select" value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
-                  <option value="Cash">Cash</option>
-                  <option value="Card">Card</option>
-                  <option value="Bank Transfer">Bank Transfer</option>
-                </select>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+                  {[
+                    { id: 'Cash', icon: <IconCash /> },
+                    { id: 'Card', icon: <IconCreditCard /> },
+                    { id: 'Bank Transfer', icon: <IconBankTransfer /> }
+                  ].map(method => (
+                    <button
+                      key={method.id}
+                      type="button"
+                      onClick={() => setPaymentMethod(method.id)}
+                      className={`btn ${paymentMethod === method.id ? 'btn-primary' : 'btn-secondary'}`}
+                      style={{
+                        padding: '10px 4px',
+                        fontSize: '12px',
+                        flexDirection: 'column',
+                        gap: '6px',
+                        border: paymentMethod === method.id ? '2px solid var(--brand-primary)' : '1px solid var(--border-color)',
+                        opacity: paymentMethod === method.id ? 1 : 0.7
+                      }}
+                    >
+                      {method.icon}
+                      <span style={{ fontWeight: 600 }}>{method.id}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
+
               <div className="form-group">
                 <label className="form-label">Payment Status</label>
-                <select id="payment-status" className="form-select" value={paymentStatus} onChange={e => setPaymentStatus(e.target.value)}>
-                  <option value="Paid">Paid</option>
-                  <option value="Pending">Pending</option>
-                </select>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  {['Paid', 'Pending'].map(status => (
+                    <button
+                      key={status}
+                      type="button"
+                      onClick={() => setPaymentStatus(status)}
+                      className={`btn ${paymentStatus === status ? 'btn-primary' : 'btn-secondary'}`}
+                      style={{
+                        padding: '10px 4px',
+                        fontSize: '13px',
+                        gap: '8px',
+                        border: paymentStatus === status ? '2px solid var(--brand-primary)' : '1px solid var(--border-color)',
+                        opacity: paymentStatus === status ? 1 : 0.7
+                      }}
+                    >
+                      {status === 'Paid' ? <IconCheck size={18} /> : <IconClock size={18} />}
+                      <span style={{ fontWeight: 600 }}>{status}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
               <div className="form-group">
                 <label className="form-label">Notes (optional)</label>
