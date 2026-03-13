@@ -22,7 +22,7 @@ export async function PUT(
   try {
     const { id } = params
     const body = await request.json()
-    const { name, type, size, material, purchasedPrice, price, stock, lowStock, description, image } = body
+    const { name, type, size, material, purchasedPrice, price, stock, lowStock, description, images } = body
 
     const product = await prisma.product.update({
       where: { id },
@@ -36,7 +36,7 @@ export async function PUT(
         stock: parseInt(stock),
         lowStock: parseInt(lowStock) || 5,
         description,
-        image,
+        images: Array.isArray(images) ? images : [],
       },
     })
 

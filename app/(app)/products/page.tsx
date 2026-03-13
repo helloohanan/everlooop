@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import {
   IconEdit, IconPlus, IconWarning, IconImage, IconDelete, IconClock, IconSave, IconSearch, IconInventory, IconSize, IconX, IconCheck,
-  IconFilter
+  IconFilter, IconRefresh
 } from '@/components/Icons'
 
 interface Product {
@@ -17,12 +17,232 @@ interface Product {
   stock: number
   lowStock: number
   description?: string
-  image?: string
+  images: string[]
   createdAt: string
 }
 
 const TYPES = ['Persian', 'Turkish', 'Handmade', 'Machine-made', 'Berber', 'Kilim', 'Shaggy', 'Other']
 const MATERIALS = ['Wool', 'Silk', 'Synthetic', 'Cotton', 'Jute', 'Other']
+
+function ProductCard({
+  p,
+  isSelected,
+  onSelect,
+  openAdminAction,
+  formatCurr,
+  getStockLevel
+}: {
+  p: Product,
+  isSelected: boolean,
+  onSelect: (id: string | null) => void,
+  openAdminAction: (action: any, data?: Product) => void,
+  formatCurr: (n: number) => string,
+  getStockLevel: (stock: number, low: number) => string
+}) {
+  const [showThumbnail, setShowThumbnail] = useState(true);
+
+  const thumbImage = p.images?.find(img => img.toLowerCase().includes('-thumb')) || p.images?.[0];
+  const mainImage = p.images?.find(img => !img.toLowerCase().includes('-thumb')) || p.images?.[0];
+
+  const currentImage = showThumbnail ? thumbImage : mainImage;
+
+  return (
+    <div
+      className={`card flip-card ${isSelected ? 'flipped' : ''}`}
+      onClick={() => onSelect(isSelected ? null : p.id)}
+      style={{
+        padding: 0,
+        overflow: 'visible',
+        cursor: 'pointer',
+        perspective: '1000px',
+        backgroundColor: 'transparent',
+        border: 'none',
+        boxShadow: 'none',
+        height: '400px'
+      }}
+    >
+      <div
+        className="flip-card-inner"
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          textAlign: 'center',
+          transition: 'transform 0.6s',
+          transformStyle: 'preserve-3d',
+          transform: isSelected ? 'rotateY(180deg)' : 'rotateY(0deg)',
+          boxShadow: isSelected ? '0 0 0 2px rgba(139, 92, 246, 0.4)' : 'var(--shadow-sm)',
+          borderRadius: '12px'
+        }}
+      >
+        {/* Front Face */}
+        <div
+          className="flip-card-front"
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            backfaceVisibility: 'hidden',
+            backgroundColor: 'var(--bg-card)',
+            borderRadius: '12px',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            border: '1px solid var(--border-color)',
+            transform: 'rotateY(0deg)'
+          }}
+        >
+          {/* Image */}
+          <div style={{ position: 'relative', width: '100%', height: '180px', background: 'var(--bg-table-header)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            {currentImage ? (
+              <img src={currentImage} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <IconInventory size={64} style={{ opacity: 0.3 }} />
+            )}
+
+            {p.images && p.images.length > 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowThumbnail(!showThumbnail);
+                }}
+                style={{
+                  position: 'absolute',
+                  top: '10px',
+                  right: '10px',
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '10px',
+                  padding: '6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: 'var(--shadow-sm)',
+                  zIndex: 10,
+                  transition: 'all 0.2s',
+                  color: 'var(--primary-color)'
+                }}
+                title="Swap Image"
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = 'white';
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.9)';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
+              >
+                <IconRefresh size={18} />
+              </button>
+            )}
+
+            {p.images && p.images.length > 1 && (
+              <div style={{
+                position: 'absolute',
+                bottom: '10px',
+                left: '10px',
+                background: 'rgba(0, 0, 0, 0.6)',
+                backdropFilter: 'blur(4px)',
+                color: 'white',
+                padding: '3px 10px',
+                borderRadius: '20px',
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '0.02em'
+              }}>
+                {showThumbnail ? 'Thumbnail View' : 'Original Design'}
+              </div>
+            )}
+          </div>
+
+          {/* Body */}
+          <div style={{ padding: '18px', display: 'flex', flexDirection: 'column', gap: '10px', flex: 1, textAlign: 'left' }}>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '4px', color: 'var(--text-color)' }}>{p.name}</div>
+              <span style={{ fontSize: '12px', background: 'var(--bg-table-header)', padding: '2px 8px', borderRadius: '4px', color: 'var(--text-muted)', fontWeight: 500 }}>{p.productId}</span>
+            </div>
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', fontSize: '13px', color: 'var(--text-muted)' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><IconSize size={14} /> {p.size || '—'}</span>
+              <span>•</span>
+              <span>{p.type}</span>
+              <span>•</span>
+              <span>{p.material}</span>
+            </div>
+
+            <div style={{ marginTop: 'auto', paddingTop: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontWeight: 800, fontSize: '18px', color: 'var(--primary-color)' }}>{formatCurr(p.price)}</span>
+                <span className={`badge ${getStockLevel(p.stock, p.lowStock)}`} style={{ fontSize: '12px', padding: '4px 10px' }}>
+                  {p.stock === 0 ? <><IconX size={12} /> Out</> : p.stock <= p.lowStock ? <><IconWarning size={12} /> Low ({p.stock})</> : <><IconCheck size={12} /> {p.stock} in stock</>}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Back Face */}
+        <div
+          className="flip-card-back"
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            backfaceVisibility: 'hidden',
+            backgroundColor: 'var(--bg-card)',
+            borderRadius: '12px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '12px',
+            padding: '24px',
+            border: '2px solid var(--primary-color)',
+            transform: 'rotateY(180deg)'
+          }}
+        >
+          <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+            <h3 style={{ margin: '0 0 4px 0', color: 'var(--text-color)', fontSize: '18px', fontWeight: 700 }}>{p.name}</h3>
+            <div style={{ color: 'var(--text-muted)', fontSize: '13px' }}>{p.productId}</div>
+          </div>
+
+          <button
+            className="btn btn-secondary"
+            style={{ width: '100%', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+            onClick={(e) => { e.stopPropagation(); openAdminAction('view', p); }}
+          >
+            <IconSearch size={18} /> View Detailed Info
+          </button>
+
+          <button
+            className="btn btn-primary"
+            style={{ width: '100%', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+            onClick={(e) => { e.stopPropagation(); openAdminAction('edit', p); }}
+          >
+            <IconEdit size={18} /> Edit Product
+          </button>
+
+          <button
+            className="btn btn-danger"
+            style={{ width: '100%', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+            onClick={(e) => { e.stopPropagation(); openAdminAction('delete', p); }}
+          >
+            <IconDelete size={18} /> Delete Product
+          </button>
+
+          <button
+            className="btn btn-secondary"
+            style={{ width: '100%', marginTop: 'auto', padding: '10px', fontSize: '13px' }}
+            onClick={(e) => { e.stopPropagation(); onSelect(null); }}
+          >
+            Close Actions
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function ProductModal({ product, onClose, onSave }: {
   product: Product | null
@@ -40,22 +260,25 @@ function ProductModal({ product, onClose, onSave }: {
     stock: product?.stock?.toString() || '0',
     lowStock: product?.lowStock?.toString() || '5',
     description: product?.description || '',
-    image: product?.image || '',
+    images: product?.images || [],
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [imagePreview, setImagePreview] = useState<string>(product?.image || '')
+  const [imagePreviews, setImagePreviews] = useState<string[]>(product?.images || [])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      const dataUrl = reader.result as string
-      setImagePreview(dataUrl)
-      setForm(f => ({ ...f, image: dataUrl }))
-    }
-    reader.readAsDataURL(file)
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
+
+    files.forEach(file => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const dataUrl = reader.result as string
+        setImagePreviews(prev => [...prev, dataUrl].slice(0, 5))
+        setForm(f => ({ ...f, images: [...f.images, dataUrl].slice(0, 5) }))
+      }
+      reader.readAsDataURL(file)
+    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -135,50 +358,51 @@ function ProductModal({ product, onClose, onSave }: {
               <textarea id="prod-desc" className="form-textarea" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Carpet details, origin, craftsmanship..." />
             </div>
             <div className="form-group">
-              <label className="form-label">Product Image (optional)</label>
-              <div
-                style={{
-                  border: '2px dashed var(--border-color)',
-                  borderRadius: '10px',
-                  padding: '16px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '12px',
-                  cursor: 'pointer',
-                  background: 'var(--bg-table-header)',
-                  transition: 'border-color 0.2s',
-                }}
-                onClick={() => document.getElementById('prod-image-file')?.click()}
-              >
-                {imagePreview ? (
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    style={{ width: '100%', maxHeight: '160px', objectFit: 'contain', borderRadius: '6px' }}
-                  />
-                ) : (
-                  <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
-                    <div style={{ fontSize: '36px', marginBottom: '4px' }}><IconImage size={48} /></div>
-                    <div style={{ fontSize: '13px', fontWeight: 600 }}>Click to select an image</div>
-                    <div style={{ fontSize: '11px', marginTop: '2px' }}>JPG, PNG, WEBP supported</div>
+              <label className="form-label">Product Images (up to 5)</label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px' }}>
+                {imagePreviews.map((p, i) => (
+                  <div key={i} style={{ position: 'relative', height: '100px', border: '1px solid var(--border-color)', borderRadius: '8px', overflow: 'hidden' }}>
+                    <img src={p} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <button
+                      type="button"
+                      style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(239, 68, 68, 0.9)', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}
+                      onClick={() => {
+                        setImagePreviews(prev => prev.filter((_, idx) => idx !== i))
+                        setForm(f => ({ ...f, images: f.images.filter((_, idx) => idx !== i) }))
+                      }}
+                    >
+                      ×
+                    </button>
                   </div>
-                )}
-                {imagePreview && (
-                  <button
-                    type="button"
-                    className="btn btn-sm btn-secondary"
-                    style={{ alignSelf: 'center' }}
-                    onClick={e => { e.stopPropagation(); setImagePreview(''); setForm(f => ({ ...f, image: '' })) }}
+                ))}
+                {imagePreviews.length < 5 && (
+                  <div
+                    style={{
+                      border: '2px dashed var(--border-color)',
+                      borderRadius: '10px',
+                      height: '100px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      background: 'var(--bg-table-header)',
+                      transition: 'border-color 0.2s',
+                    }}
+                    onClick={() => document.getElementById('prod-image-file')?.click()}
                   >
-                    <IconDelete /> Remove Image
-                  </button>
+                    <div style={{ color: 'var(--text-muted)', textAlign: 'center' }}>
+                      <IconImage size={24} />
+                      <div style={{ fontSize: '10px', fontWeight: 600 }}>Add Image</div>
+                    </div>
+                  </div>
                 )}
               </div>
               <input
                 id="prod-image-file"
                 type="file"
                 accept="image/*"
+                multiple
                 style={{ display: 'none' }}
                 onChange={handleImageChange}
               />
@@ -212,13 +436,20 @@ function ProductDetailsModal({ product, onClose }: {
         <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
             <div style={{ flex: '1', minWidth: '280px' }}>
-              {product.image ? (
-                <img src={product.image} alt={product.name} style={{ width: '100%', borderRadius: '12px', border: '1px solid var(--border-color)' }} />
-              ) : (
-                <div style={{ width: '100%', height: '200px', background: 'var(--bg-table-header)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <IconInventory size={64} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {product.images?.[0] ? (
+                  <img src={product.images[0]} alt={product.name} style={{ width: '100%', borderRadius: '12px', border: '1px solid var(--border-color)' }} />
+                ) : (
+                  <div style={{ width: '100%', height: '200px', background: 'var(--bg-table-header)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <IconInventory size={64} />
+                  </div>
+                )}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+                  {product.images?.slice(1).map((img, i) => (
+                    <img key={i} src={img} alt={`${product.name} ${i + 2}`} style={{ width: '100%', height: '60px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border-color)' }} />
+                  ))}
                 </div>
-              )}
+              </div>
             </div>
             <div style={{ flex: '2', minWidth: '280px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
@@ -496,9 +727,15 @@ export default function ProductsPage() {
             }}>
               {Object.entries(filteredProducts.reduce((acc, p) => {
                 const cat = p.name.split(' ')[0]
-                if (!acc[cat]) acc[cat] = { count: 0, image: p.image }
+                if (!acc[cat]) {
+                  const thumb = p.images?.find(img => img.toLowerCase().includes('-thumb'))
+                  acc[cat] = { count: 0, image: thumb || p.images?.[0] }
+                }
                 acc[cat].count++
-                if (!acc[cat].image && p.image) acc[cat].image = p.image
+                if (!acc[cat].image && p.images) {
+                  const thumb = p.images.find(img => img.toLowerCase().includes('-thumb'))
+                  acc[cat].image = thumb || p.images[0]
+                }
                 return acc
               }, {} as Record<string, { count: number, image?: string }>))
                 .sort(([a], [b]) => sortBy.includes('desc') ? b.localeCompare(a) : a.localeCompare(b))
@@ -545,144 +782,17 @@ export default function ProductsPage() {
               gridTemplateColumns: 'repeat(4, 1fr)',
               gap: '20px',
             }}>
-              {filteredProducts.filter(p => p.name.split(' ')[0] === selectedCategory).map(p => {
-                const isSelected = selectedProductId === p.id
-                return (
-                  <div
-                    key={p.id}
-                    className={`card flip-card ${isSelected ? 'flipped' : ''}`}
-                    onClick={() => setSelectedProductId(isSelected ? null : p.id)}
-                    style={{
-                      padding: 0,
-                      overflow: 'visible',
-                      cursor: 'pointer',
-                      perspective: '1000px',
-                      backgroundColor: 'transparent',
-                      border: 'none',
-                      boxShadow: 'none',
-                      height: '380px'
-                    }}
-                  >
-                    <div
-                      className="flip-card-inner"
-                      style={{
-                        position: 'relative',
-                        width: '100%',
-                        height: '100%',
-                        textAlign: 'center',
-                        transition: 'transform 0.6s',
-                        transformStyle: 'preserve-3d',
-                        transform: isSelected ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                        boxShadow: isSelected ? '0 0 0 2px rgba(139, 92, 246, 0.4)' : 'var(--shadow-sm)',
-                        borderRadius: '12px'
-                      }}
-                    >
-                      {/* Front Face */}
-                      <div
-                        className="flip-card-front"
-                        style={{
-                          position: 'absolute',
-                          width: '100%',
-                          height: '100%',
-                          backfaceVisibility: 'hidden',
-                          backgroundColor: 'var(--bg-card)',
-                          borderRadius: '12px',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          overflow: 'hidden',
-                          border: '1px solid var(--border-color)',
-                          transform: 'rotateY(0deg)'
-                        }}
-                      >
-                        {/* Image */}
-                        <div style={{ width: '100%', height: '160px', background: 'var(--bg-table-header)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          {p.image ? (
-                            <img src={p.image} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          ) : (
-                            <IconInventory size={64} />
-                          )}
-                        </div>
-
-                        {/* Body */}
-                        <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
-                          <div>
-                            <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '2px' }}>{p.name}</div>
-                            <code style={{ fontSize: '11px', background: 'var(--bg-table-header)', padding: '2px 7px', borderRadius: '4px', color: 'var(--text-muted)' }}>{p.productId}</code>
-                          </div>
-
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', fontSize: '12px', color: 'var(--text-muted)' }}>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><IconSize /> {p.size || '—'}</span>
-                            <span>•</span>
-                            <span>{p.type}</span>
-                            <span>•</span>
-                            <span>{p.material}</span>
-                          </div>
-
-                          <div style={{ marginTop: 'auto', paddingTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <span style={{ fontWeight: 700, fontSize: '16px', color: 'var(--primary-color)' }}>{formatCurr(p.price)}</span>
-                              <span className={`badge ${getStockLevel(p.stock, p.lowStock)}`} style={{ fontSize: '11px' }}>
-                                {p.stock === 0 ? <><IconX size={12} /> Out of Stock</> : p.stock <= p.lowStock ? <><IconWarning size={12} /> Low ({p.stock})</> : <><IconCheck size={12} /> {p.stock}</>}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Back Face */}
-                      <div
-                        className="flip-card-back"
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '16px',
-                          padding: '24px',
-                          border: '1px solid var(--primary-color)',
-                          boxShadow: 'inset 0 0 20px rgba(0,0,0,0.05)',
-                          borderRadius: '12px'
-                        }}
-                      >
-                        <h3 style={{ margin: 0, color: 'var(--text-color)', fontSize: '18px' }}>{p.name}</h3>
-                        <div style={{ color: 'var(--text-muted)', fontSize: '13px', marginBottom: '8px' }}>{p.productId}</div>
-
-                        <button
-                          className="btn btn-secondary"
-                          style={{ width: '100%', padding: '12px' }}
-                          onClick={(e) => { e.stopPropagation(); openAdminAction('view', p); }}
-                        >
-                          <IconSearch /> View Details
-                        </button>
-
-                        <button
-                          className="btn btn-primary"
-                          style={{ width: '100%', padding: '12px' }}
-                          onClick={(e) => { e.stopPropagation(); openAdminAction('edit', p); }}
-                        >
-                          <IconEdit /> Edit Product
-                        </button>
-
-                        <button
-                          className="btn btn-danger"
-                          style={{ width: '100%', padding: '12px' }}
-                          onClick={(e) => { e.stopPropagation(); openAdminAction('delete', p); }}
-                        >
-                          <IconDelete /> Delete Product
-                        </button>
-
-                        <button
-                          className="btn btn-secondary"
-                          style={{ width: '100%', marginTop: 'auto', padding: '10px' }}
-                          onClick={(e) => { e.stopPropagation(); setSelectedProductId(null); }}
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
+              {filteredProducts.filter(p => p.name.split(' ')[0] === selectedCategory).map(p => (
+                <ProductCard
+                  key={p.id}
+                  p={p}
+                  isSelected={selectedProductId === p.id}
+                  onSelect={setSelectedProductId}
+                  openAdminAction={openAdminAction}
+                  formatCurr={formatCurr}
+                  getStockLevel={getStockLevel}
+                />
+              ))}
             </div>
           )}
         </>

@@ -14,9 +14,9 @@ export async function GET(request: NextRequest) {
           { deletedAt: deletedOnly ? { not: null } : null },
           search ? {
             OR: [
-              { name: { contains: search } },
-              { productId: { contains: search } },
-              { type: { contains: search } },
+              { name: { contains: search, mode: 'insensitive' } },
+              { productId: { contains: search, mode: 'insensitive' } },
+              { type: { contains: search, mode: 'insensitive' } },
             ]
           } : {},
           type ? { type } : {},
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     })
 
     return NextResponse.json(products)
-  } catch (err) {
+  } catch (err: any) {
     console.error('GET products error:', err)
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { productId, name, type, size, material, purchasedPrice, price, stock, lowStock, description, image } = body
+    const { productId, name, type, size, material, purchasedPrice, price, stock, lowStock, description, images } = body
 
     if (!productId || !name || !price) {
       return NextResponse.json({ error: 'Product ID, name and price are required' }, { status: 400 })
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
         stock: parseInt(stock) || 0,
         lowStock: parseInt(lowStock) || 5,
         description,
-        image,
+        images: Array.isArray(images) ? images : [],
       },
     })
 

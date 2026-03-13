@@ -5,7 +5,7 @@ import { IconWarning, IconCustomers, IconPhone, IconEmail, IconLocation, IconSea
 
 interface Customer { id: string; name: string; phone?: string; email?: string; address?: string }
 interface Product { id: string; productId: string; name: string; type: string; size: string; material: string; price: number; stock: number }
-interface LineItem { productId: string; product: Product; quantity: number; price: number; size: string; total: number; unitPriceStr?: string }
+interface LineItem { productId: string; product: Product; quantity: number; price: number; size: string; total: number; unitPriceStr?: string; qtyStr?: string }
 
 export default function BillingPage() {
   const router = useRouter()
@@ -32,12 +32,60 @@ export default function BillingPage() {
   const filteredCustomers = customers.filter(c =>
     c.name.toLowerCase().includes(customerSearch.toLowerCase()) ||
     (c.phone || '').includes(customerSearch)
-  )
+  ).sort((a, b) => {
+    const q = customerSearch.toLowerCase()
+    const aName = a.name.toLowerCase()
+    const bName = b.name.toLowerCase()
+    const aPhone = (a.phone || '')
+    const bPhone = (b.phone || '')
+
+    // Priority 1: Exact name match
+    if (aName === q && bName !== q) return -1
+    if (bName === q && aName !== q) return 1
+
+    // Priority 2: Name starts with query
+    const aNameStarts = aName.startsWith(q)
+    const bNameStarts = bName.startsWith(q)
+    if (aNameStarts && !bNameStarts) return -1
+    if (bNameStarts && !aNameStarts) return 1
+
+    // Priority 3: Phone starts with query
+    const aPhoneStarts = aPhone.startsWith(q)
+    const bPhoneStarts = bPhone.startsWith(q)
+    if (aPhoneStarts && !bPhoneStarts) return -1
+    if (bPhoneStarts && !aPhoneStarts) return 1
+
+    return aName.localeCompare(bName)
+  })
 
   const filteredProducts = products.filter(p =>
     p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
     p.productId.toLowerCase().includes(productSearch.toLowerCase())
-  )
+  ).sort((a, b) => {
+    const q = productSearch.toLowerCase()
+    const aId = a.productId.toLowerCase()
+    const bId = b.productId.toLowerCase()
+    const aName = a.name.toLowerCase()
+    const bName = b.name.toLowerCase()
+
+    // Priority 1: Product ID starts with query
+    const aIdStarts = aId.startsWith(q)
+    const bIdStarts = bId.startsWith(q)
+    if (aIdStarts && !bIdStarts) return -1
+    if (bIdStarts && !aIdStarts) return 1
+
+    // Priority 2: Name starts with query
+    const aNameStarts = aName.startsWith(q)
+    const bNameStarts = bName.startsWith(q)
+    if (aNameStarts && !bNameStarts) return -1
+    if (bNameStarts && !aNameStarts) return 1
+
+    // Priority 3: Product ID exact match (already covered by startsWith but for clarity)
+    if (aId === q && bId !== q) return -1
+    if (bId === q && aId !== q) return 1
+
+    return aName.localeCompare(bName)
+  })
 
   const addProduct = (p: Product) => {
     setShowProductDrop(false)
@@ -96,23 +144,32 @@ export default function BillingPage() {
   const updateQty = (productId: string, qty: number) => {
     setManualTotal('')
     setDiscount('')
-    if (qty <= 0) {
-      setItems(items.filter(i => i.productId !== productId))
-    } else {
-      setItems(items.map(i => i.productId === productId
-        ? { ...i, quantity: qty, total: i.price * qty }
-        : i
-      ))
-    }
+    setItems(items.map(i => i.productId === productId
+      ? { ...i, quantity: qty, total: i.price * qty, qtyStr: undefined }
+      : i
+    ))
+  }
+
+  const updateQtyStr = (productId: string, qtyStr: string) => {
+    setManualTotal('')
+    setDiscount('')
+    setItems(items.map(i => {
+      if (i.productId !== productId) return i
+      if (qtyStr === '') return { ...i, qtyStr: '' }
+      const qty = parseInt(qtyStr) || 0
+      return { ...i, quantity: qty, total: i.price * qty, qtyStr: undefined }
+    }))
   }
 
   const updatePrice = (productId: string, price: number) => {
     setManualTotal('')
     setDiscount('')
-    setItems(items.map(i => i.productId === productId
-      ? { ...i, price, total: price * i.quantity, unitPriceStr: undefined }
-      : i
-    ))
+    setItems(items.map(i => {
+      if (i.productId !== productId) return i
+      // Constraint: Unit price cannot be above of cost (product.price)
+      const cappedPrice = Math.min(price, i.product.price)
+      return { ...i, price: cappedPrice, total: cappedPrice * i.quantity, unitPriceStr: undefined }
+    }))
   }
 
   const updateUnitPrice = (productId: string, unitPriceStr: string) => {
@@ -291,11 +348,10 @@ export default function BillingPage() {
                     <thead>
                       <tr>
                         <th style={{ padding: '10px 12px' }}>Product</th>
-                        <th style={{ width: '90px', padding: '10px 12px' }}>Size</th>
-                        <th style={{ width: '85px', padding: '10px 12px' }}>Unit Price</th>
-                        <th style={{ width: '85px', padding: '10px 12px' }}>Price (QAR)</th>
-                        <th style={{ width: '60px', padding: '10px 12px' }}>Qty</th>
-                        <th style={{ width: '100px', padding: '10px 12px' }}>Total</th>
+                        <th style={{ width: '90px', padding: '10px 12px' }}>Cost</th>
+                        <th style={{ width: '100px', padding: '10px 12px' }}>Unit Price</th>
+                        <th style={{ width: '80px', padding: '10px 12px' }}>Qty</th>
+                        <th style={{ width: '110px', padding: '10px 12px' }}>Total</th>
                         <th style={{ width: '36px', padding: '10px 12px' }}></th>
                       </tr>
                     </thead>
@@ -306,27 +362,8 @@ export default function BillingPage() {
                             <div style={{ fontWeight: 600, fontSize: '12px' }}>{item.product.name}</div>
                             <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{item.product.productId} · {item.product.type}</div>
                           </td>
-                          <td style={{ padding: '8px 12px' }}>
-                            <input
-                              type="text"
-                              value={item.size}
-                              onChange={e => updateSize(item.productId, e.target.value)}
-                              className="form-input"
-                              placeholder="e.g. 5x7"
-                              style={{ width: '80px', padding: '4px 6px', fontSize: '12px', height: '30px' }}
-                            />
-                          </td>
-                          <td style={{ padding: '8px 12px' }}>
-                            <input
-                              type="number"
-                              min="0"
-                              step="0.01"
-                              value={getUnitPrice(item)}
-                              onChange={e => updateUnitPrice(item.productId, e.target.value)}
-                              className="form-input no-spin"
-                              placeholder=""
-                              style={{ width: '75px', padding: '4px 6px', fontSize: '12px', height: '30px' }}
-                            />
+                          <td style={{ padding: '8px 12px', color: 'var(--text-muted)' }}>
+                            QAR {item.product.price.toLocaleString()}
                           </td>
                           <td style={{ padding: '8px 12px' }}>
                             <input
@@ -337,18 +374,19 @@ export default function BillingPage() {
                               onChange={e => updatePrice(item.productId, parseFloat(e.target.value) || 0)}
                               className="form-input no-spin"
                               placeholder="0.00"
-                              style={{ width: '75px', padding: '4px 6px', fontSize: '12px', height: '30px' }}
+                              style={{ width: '90px', padding: '4px 8px', fontSize: '12px', height: '32px' }}
                             />
                           </td>
                           <td style={{ padding: '8px 12px' }}>
                             <input
                               type="number"
-                              min="1"
+                              min="0"
                               max={item.product.stock}
-                              value={item.quantity}
-                              onChange={e => updateQty(item.productId, parseInt(e.target.value) || 0)}
-                              className="form-input"
-                              style={{ width: '50px', padding: '4px 6px', fontSize: '12px', height: '30px' }}
+                              value={item.qtyStr !== undefined ? item.qtyStr : item.quantity}
+                              onChange={e => updateQtyStr(item.productId, e.target.value)}
+                              className="form-input no-spin"
+                              placeholder="0"
+                              style={{ width: '90px', padding: '4px 8px', fontSize: '12px', height: '32px' }}
                             />
                           </td>
                           <td style={{ padding: '8px 12px', fontWeight: 700 }}>QAR {item.total.toLocaleString('en-QA', { minimumFractionDigits: 2 })}</td>
