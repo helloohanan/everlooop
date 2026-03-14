@@ -22,6 +22,7 @@
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",
     "next": "^14.2.35",
+    "nodemailer": "^8.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "recharts": "^2.12.5"
@@ -29,6 +30,7 @@
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
+    "@types/nodemailer": "^7.0.11",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "concurrently": "^8.2.2",

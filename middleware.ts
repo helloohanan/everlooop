@@ -3,7 +3,15 @@ import { jwtVerify } from 'jose'
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'ever-loops-secret')
 
-const publicPaths = ['/login', '/api/auth/login', '/logo.png']
+const publicPaths = [
+  '/login', 
+  '/api/auth/login', 
+  '/logo.png',
+  '/forgot-password',
+  '/reset-password',
+  '/api/auth/forgot-password',
+  '/api/auth/reset-password'
+]
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl

@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs'
 
 export async function POST(request: NextRequest) {
   try {
-    const { username, password } = await request.json()
+    const { username, password, role } = await request.json()
 
     if (!username || !password) {
       return NextResponse.json({ error: 'Username and password are required' }, { status: 400 })
@@ -13,8 +13,8 @@ export async function POST(request: NextRequest) {
 
     const user = await prisma.user.findUnique({ where: { username } })
 
-    if (!user) {
-      return NextResponse.json({ error: 'Invalid username or password' }, { status: 401 })
+    if (!user || (role && user.role !== role)) {
+      return NextResponse.json({ error: 'Invalid username or password for this role' }, { status: 401 })
     }
 
     const valid = await bcrypt.compare(password, user.password)

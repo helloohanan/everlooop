@@ -6,11 +6,18 @@ export default function SettingsPage() {
     const [currentPassword, setCurrentPassword] = useState('')
     const [newPassword, setNewPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
+
+    // Email update state
+    const [newEmail, setNewEmail] = useState('')
+    const [emailLoading, setEmailLoading] = useState(false)
+    const [emailError, setEmailError] = useState('')
+    const [emailSuccess, setEmailSuccess] = useState('')
+
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handlePasswordSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setError('')
         setSuccess('')
@@ -49,64 +56,97 @@ export default function SettingsPage() {
         }
     }
 
+    const handleEmailSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setEmailError('')
+        setEmailSuccess('')
+        setEmailLoading(true)
+
+        try {
+            const res = await fetch('/api/auth/update-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: newEmail }),
+            })
+
+            const data = await res.json()
+            if (res.ok) {
+                setEmailSuccess('Company email updated successfully')
+                setNewEmail('')
+            } else {
+                setEmailError(data.error || 'Failed to update email')
+            }
+        } catch {
+            setEmailError('Connection error')
+        } finally {
+            setEmailLoading(false)
+        }
+    }
+
     return (
         <div className="page-content">
             <div className="section-header">
                 <div>
                     <h1 className="section-title">Account Settings</h1>
-                    <p className="section-subtitle">Manage your login credentials</p>
+                    <p className="section-subtitle">Manage your credentials and security</p>
                 </div>
             </div>
 
-            <div className="card" style={{ maxWidth: '500px' }}>
-                <div className="card-header">
-                    <h2 className="card-title"><IconLock /> Change Password</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
+                <div className="card">
+                    <div className="card-header">
+                        <h2 className="card-title"><IconLock /> Change Password</h2>
+                    </div>
+                    <div className="card-body">
+                        <form onSubmit={handlePasswordSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            {error && <div className="alert alert-danger"><IconWarning /> {error}</div>}
+                            {success && <div className="alert alert-paid"><IconCheck /> {success}</div>}
+                            <div className="form-group">
+                                <label className="form-label">Current Password</label>
+                                <input type="password" name="currentPassword" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} className="form-input" placeholder="••••••••" required />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">New Password</label>
+                                <input type="password" name="newPassword" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="form-input" placeholder="••••••••" required />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Confirm New Password</label>
+                                <input type="password" name="confirmPassword" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="form-input" placeholder="••••••••" required />
+                            </div>
+                            <button type="submit" className="btn btn-primary" disabled={loading}>
+                                {loading ? 'Updating...' : 'Update Password'}
+                            </button>
+                        </form>
+                    </div>
                 </div>
-                <div className="card-body">
-                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                        {error && <div className="alert alert-danger"><IconWarning /> {error}</div>}
-                        {success && <div className="alert alert-paid"><IconCheck /> {success}</div>}
 
-                        <div className="form-group">
-                            <label className="form-label">Current Password</label>
-                            <input
-                                type="password"
-                                className="form-input"
-                                value={currentPassword}
-                                onChange={e => setCurrentPassword(e.target.value)}
-                                placeholder="••••••••"
-                                required
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label className="form-label">New Password</label>
-                            <input
-                                type="password"
-                                className="form-input"
-                                value={newPassword}
-                                onChange={e => setNewPassword(e.target.value)}
-                                placeholder="••••••••"
-                                required
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label className="form-label">Confirm New Password</label>
-                            <input
-                                type="password"
-                                className="form-input"
-                                value={confirmPassword}
-                                onChange={e => setConfirmPassword(e.target.value)}
-                                placeholder="••••••••"
-                                required
-                            />
-                        </div>
-
-                        <button type="submit" className="btn btn-primary" disabled={loading} style={{ marginTop: '8px' }}>
-                            {loading ? <><IconClock style={{ marginRight: '8px' }} /> Updating...</> : 'Update Password'}
-                        </button>
-                    </form>
+                <div className="card">
+                    <div className="card-header">
+                        <h2 className="card-title">📧 Company Email</h2>
+                    </div>
+                    <div className="card-body">
+                        <form onSubmit={handleEmailSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            {emailError && <div className="alert alert-danger"><IconWarning /> {emailError}</div>}
+                            {emailSuccess && <div className="alert alert-paid"><IconCheck /> {emailSuccess}</div>}
+                            <div className="form-group">
+                                <label className="form-label">New Recovery Email</label>
+                                <input
+                                    type="email"
+                                    className="form-input"
+                                    value={newEmail}
+                                    onChange={e => setNewEmail(e.target.value)}
+                                    placeholder="helloohanan@gmail.com"
+                                    required
+                                />
+                                <p className="section-subtitle" style={{ marginTop: '8px', fontSize: '12px' }}>
+                                    This email will receive secret codes for password recovery.
+                                </p>
+                            </div>
+                            <button type="submit" className="btn btn-primary" disabled={emailLoading} style={{ background: 'var(--brand-secondary)' }}>
+                                {emailLoading ? 'Updating...' : 'Update Email'}
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
