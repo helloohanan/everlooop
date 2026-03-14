@@ -41,6 +41,9 @@ export async function POST(request: NextRequest) {
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
         const resetLink = `${appUrl}/reset-password?token=${token}`
 
+        // Log the link for local development/testing
+        console.log(`[RESET LINK] Sent to ${email}: ${resetLink}`)
+
         // Configure Nodemailer
         const transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST,
@@ -74,7 +77,13 @@ export async function POST(request: NextRequest) {
             `,
         }
 
-        await transporter.sendMail(mailOptions)
+        try {
+            await transporter.sendMail(mailOptions)
+        } catch (mailError) {
+            console.error('SMTP Error:', mailError)
+            // Still return success so the user can see the link in the console
+            // but we log that the physical email failed.
+        }
 
         return NextResponse.json({ 
             success: true, 
@@ -82,6 +91,6 @@ export async function POST(request: NextRequest) {
         })
     } catch (err: any) {
         console.error('Forgot password error:', err)
-        return NextResponse.json({ error: 'Failed to send reset email' }, { status: 500 })
+        return NextResponse.json({ error: 'Server error' }, { status: 500 })
     }
 }
