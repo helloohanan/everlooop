@@ -60,9 +60,15 @@ model Invoice {
   discount      Float         @default(0)
   vat           Float
   total         Float
-  paymentMethod String        @default("Cash")
-  paymentStatus String        @default("Pending")
-  notes         String?
+  paymentMethod    String        @default("Cash")
+  paymentStatus    String        @default("Pending")
+  cashAmount       Float?
+  cardAmount       Float?
+  upiAmount        Float?
+  bankAmount       Float?
+  totalPaid        Float         @default(0)
+  remainingBalance Float         @default(0)
+  notes            String?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   items         InvoiceItem[]

@@ -46,7 +46,20 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { customerId, items, discount, paymentMethod, paymentStatus, notes } = body
+    const { 
+      customerId, 
+      items, 
+      discount, 
+      paymentMethod, 
+      paymentStatus, 
+      notes,
+      cashAmount,
+      cardAmount,
+      upiAmount,
+      bankAmount,
+      totalPaid,
+      remainingBalance
+    } = body
 
     if (!customerId || !items || items.length === 0) {
       return NextResponse.json({ error: 'Customer and items are required' }, { status: 400 })
@@ -99,6 +112,12 @@ export async function POST(request: NextRequest) {
           total,
           paymentMethod: paymentMethod || 'Cash',
           paymentStatus: paymentStatus || 'Paid',
+          cashAmount: cashAmount || 0,
+          cardAmount: cardAmount || 0,
+          upiAmount: upiAmount || 0,
+          bankAmount: bankAmount || 0,
+          totalPaid: totalPaid || 0,
+          remainingBalance: remainingBalance || 0,
           notes,
           items: {
             create: validatedItems,

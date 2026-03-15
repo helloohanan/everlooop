@@ -1,0 +1,100 @@
+
+> everloops@0.1.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use, trying 3001 instead.
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3001
+  - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 1315ms
+ ✓ Compiled /middleware in 133ms (152 modules)
+ ○ Compiling /login ...
+ ✓ Compiled /login in 1883ms (502 modules)
+ ✓ Compiled /_not-found in 73ms (491 modules)
+ GET /login 404 in 2054ms
+ ⨯ TypeError: __webpack_modules__[moduleId] is not a function
+    at __webpack_require__ (/Users/hanankarim/Downloads/ever/.next/server/webpack-runtime.js:33:42)
+    at eval (./app/login/page.tsx:5:79)
+    at (ssr)/./app/login/page.tsx (/Users/hanankarim/Downloads/ever/.next/server/app/login/page.js:107:1)
+    at Object.__webpack_require__ [as require] (/Users/hanankarim/Downloads/ever/.next/server/webpack-runtime.js:33:42)
+digest: "3772389773"
+ GET /login 500 in 40ms
+ ✓ Compiled /api/auth/login in 383ms (372 modules)
+ POST /api/auth/login 401 in 3336ms
+ POST /api/auth/login 200 in 402ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1395ms (1711 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /_next/static/webpack/c3fd93d886ad7b1a.webpack.hot-update.json 404 in 42ms
+ GET / 200 in 1327ms
+ ✓ Compiled /api/dashboard in 81ms (925 modules)
+ GET /api/dashboard 200 in 14785ms
+ GET /api/dashboard 200 in 16469ms
+ ✓ Compiled /billing in 271ms (1719 modules)
+ ✓ Compiled /api/products in 97ms (931 modules)
+ ✓ Compiled (933 modules)
+ GET /api/products 200 in 2300ms
+ GET /api/products 200 in 2300ms
+ GET /api/customers 200 in 2865ms
+ GET /api/customers 200 in 3055ms
+ ✓ Compiled /invoices in 365ms (1691 modules)
+ ✓ Compiled /api/invoices in 259ms (941 modules)
+ ✓ Compiled /api/products in 84ms (943 modules)
+ ✓ Compiled (945 modules)
+ GET /api/invoices?search=&status=&date= 200 in 2973ms
+ GET /api/invoices?search=&status=&date= 200 in 2975ms
+ GET /api/customers 200 in 1135ms
+ GET /api/customers 200 in 1142ms
+ GET /api/products 200 in 4106ms
+ GET /api/products 200 in 4123ms
+ ✓ Compiled in 658ms (1687 modules)
+ ✓ Compiled /api/products in 67ms (925 modules)
+ ✓ Compiled (927 modules)
+ GET /api/customers 200 in 1013ms
+ GET /api/customers 200 in 1046ms
+ GET /api/products 200 in 3941ms
+ GET /api/products 200 in 4057ms
+ ✓ Compiled in 470ms (1687 modules)
+ ✓ Compiled /api/invoices in 280ms (937 modules)
+ POST /api/invoices 201 in 7852ms
+ ✓ Compiled /invoices/[id] in 309ms (1733 modules)
+ ✓ Compiled /api/invoices/[id] in 95ms (943 modules)
+ GET /api/invoices/cmmrlqo8q0002nueyvlfbfygd 200 in 4971ms
+ GET /api/invoices/cmmrlqo8q0002nueyvlfbfygd 200 in 4972ms
+ ✓ Compiled /invoices in 110ms (947 modules)
+ GET /invoices 200 in 1697ms
+ GET /api/invoices?search=&status=&date= 200 in 2464ms
+ GET /api/invoices?search=&status=&date= 200 in 2795ms
+ ✓ Compiled /api/products in 95ms (949 modules)
+ ✓ Compiled (951 modules)
+ GET /api/customers 200 in 792ms
+ GET /api/customers 200 in 794ms
+ GET /api/products 200 in 4358ms
+ GET /api/products 200 in 4409ms
+ ✓ Compiled in 486ms (1697 modules)
+ ✓ Compiled in 278ms (1697 modules)
+ ✓ Compiled in 442ms (1697 modules)
+ ✓ Compiled in 432ms (1697 modules)
+ ✓ Compiled /api/products in 315ms (933 modules)
+ ✓ Compiled (935 modules)
+ GET /api/customers 200 in 3395ms
+ GET /api/customers 200 in 3386ms
+ GET /api/products 200 in 4564ms
+ GET /api/products 200 in 4587ms
+ ✓ Compiled in 237ms (1727 modules)
+ ✓ Compiled /products in 410ms (1703 modules)
+ ✓ Compiled /api/products in 85ms (937 modules)
+ GET /api/products?search=&type= 200 in 1956ms
+ GET /api/products?search=&type= 200 in 1970ms
+ ✓ Compiled in 482ms (1699 modules)
+ ✓ Compiled in 306ms (1699 modules)
+ ✓ Compiled /api/products in 178ms (933 modules)
+ ✓ Compiled (935 modules)
+ GET /api/customers 200 in 3180ms
+ GET /api/customers 200 in 3203ms
+ GET /api/products 200 in 4370ms
+ GET /api/products 200 in 4372ms
+ ✓ Compiled in 434ms (1699 modules)
+ ✓ Compiled in 509ms (1713 modules)

@@ -175,10 +175,12 @@ function InvoiceDetailContent({ id }: { id: string }) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '16px' }}>
           <div>
             <div style={{ fontSize: '10px', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Bill To</div>
-            <div style={{ fontWeight: 700, fontSize: '15px', color: '#1a2744' }}>{invoice.customer.name}</div>
-            {invoice.customer.phone && <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px' }}><IconPhone size={12} /> {invoice.customer.phone}</div>}
-            {invoice.customer.email && <div style={{ fontSize: '12px', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}><IconEmail size={12} /> {invoice.customer.email}</div>}
-            {invoice.customer.address && <div style={{ fontSize: '12px', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}><IconLocation size={12} /> {invoice.customer.address}</div>}
+            <div style={{ fontWeight: 700, fontSize: '16px', color: '#1a2744', marginBottom: '4px' }}>{invoice.customer.name}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              {invoice.customer.phone && <div style={{ fontSize: '12px', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}><IconPhone size={12} /> {invoice.customer.phone}</div>}
+              {invoice.customer.email && <div style={{ fontSize: '12px', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}><IconEmail size={12} /> {invoice.customer.email}</div>}
+              {invoice.customer.address && <div style={{ fontSize: '12px', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}><IconLocation size={12} /> {invoice.customer.address}</div>}
+            </div>
           </div>
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: '10px', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Payment</div>
@@ -225,7 +227,19 @@ function InvoiceDetailContent({ id }: { id: string }) {
         {/* Totals */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
           <div className="invoice-totals" style={{ padding: '0', background: 'transparent', border: 'none', width: 'auto', textAlign: 'right' }}>
-            <div className="invoice-total-row grand" style={{ borderBottom: 'none' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '8px', color: '#6b7280', fontSize: '13px', fontWeight: 600 }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '20px' }}>
+                <span>Subtotal</span>
+                <span style={{ minWidth: '100px' }}>{formatQAR(invoice.subtotal)}</span>
+              </div>
+              {invoice.discount > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '20px', color: '#ef4444' }}>
+                  <span>Discount</span>
+                  <span style={{ minWidth: '100px' }}>- {formatQAR(invoice.discount)}</span>
+                </div>
+              )}
+            </div>
+            <div className="invoice-total-row grand" style={{ borderBottom: 'none', borderTop: '1px solid #e5e7eb', paddingTop: '8px' }}>
               <span style={{ marginRight: '40px' }}>Grand Total</span>
               <span style={{ color: 'var(--brand-primary)' }}>{formatQAR(invoice.total)}</span>
             </div>

@@ -281,3 +281,19 @@ export const IconRefresh = ({ size = 20, ...props }: IconProps) => (
         <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
     </svg>
 )
+
+export const IconUPI = ({ size = 20, ...props }: IconProps) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" stroke="var(--brand-primary)" />
+        <path d="M12 22V12M12 12l9-5M12 12L3 7" />
+        <path d="M17 14.5l-5 3-5-3" stroke="var(--brand-primary)" />
+    </svg>
+)
+
+export const IconCart = ({ size = 20, ...props }: IconProps) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <circle cx="9" cy="21" r="1" stroke="var(--brand-primary)" />
+        <circle cx="20" cy="21" r="1" stroke="var(--brand-primary)" />
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+    </svg>
+)
